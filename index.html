@@ -478,7 +478,7 @@
 
         if (statusClass === 'good') {
             backgroundColor = 'var(--color-success)'; 
-            textContent = "Menehän jo! Puomit levillä (Erinomainen sää)";
+            textContent = "Hyvä keli päästää menöhön! (Erinomainen sää)";
             boomDrawings = `
                 ${baseTractor}
                 <path d="M128,110 L20,120 M128,125 L20,123 M20,120 L20,123" stroke="white" stroke-width="3" stroke-linecap="round" fill="none" />
@@ -490,7 +490,7 @@
         } 
         else if (statusClass === 'warning') {
             backgroundColor = 'var(--color-warning)'; 
-            textContent = "Ota varoen ja säädä paineet. Puolitila (Kohtalainen sää)";
+            textContent = "Niin ja näin, ehkä paree orottaa... (Kohtalainen sää)";
             boomDrawings = `
                 ${baseTractor}
                 <path d="M124,125 L124,40 M112,125 L112,40 M112,40 L124,40" stroke="white" stroke-width="3" stroke-linecap="round" fill="none" />
@@ -502,7 +502,7 @@
         } 
         else {
             backgroundColor = 'var(--color-danger)'; 
-            textContent = "Pysy hallis. Puomit pystyssä (Ei suositella)";
+            textContent = "Pirä vehkehet laros, ei ny voi ajaa... (Ei suositella)";
             boomDrawings = `
                 ${baseTractor}
                 <path d="M124,125 L124,40 M112,125 L112,40 M112,40 L124,40" stroke="white" stroke-width="3" stroke-linecap="round" fill="none" />
@@ -600,9 +600,9 @@
 
             // Puuskaanalyysi
             if (gust <= 5) {
-                posReasons.push("Tasainen ilmanala, puuskat vähäisiä. Puomi pysyy vakaana.");
+                posReasons.push("Tasainen ilmanala, puuskat vähäisiä.");
             } else if (gust <= 7) {
-                negReasons.push("Hieman puuskaista (5–7 m/s). Puomi saattaa keikahtaa ja aiheuttaa epätasaista jälkeä.");
+                negReasons.push("Hieman puuskaista (5–7 m/s). Ny pitää olla tuulen kans tarkkana.");
             } else {
                 negReasons.push("Kovia puuskia (yli 7 m/s). Älä ruiskuta.");
             }
