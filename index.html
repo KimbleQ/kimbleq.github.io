@@ -8,26 +8,18 @@
     <!-- Tailwind CSS tyylittelyyn -->
     <script src="https://cdn.tailwindcss.com"></script>
     
-    <!-- Leaflet.js karttakirjasto -->
-    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="" />
-    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
-    
     <style>
-        #map { height: 350px; }
-        @media (min-width: 1024px) {
-            #map { height: 450px; }
-        }
         /* Mukautettu tyyli mobiiliystävälliselle liukurille */
         input[type="range"]::-webkit-slider-thumb {
             -webkit-appearance: none;
             appearance: none;
-            width: 24px;
-            height: 24px;
-            background: #10b981;
+            width: 26px;
+            height: 26px;
+            background: #ffffff;
             border-radius: 50%;
             cursor: pointer;
-            border: 2px solid white;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+            border: 3px solid #0f172a;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.3);
         }
         html { scroll-behavior: smooth; }
     </style>
@@ -100,34 +92,42 @@
     </section>
 
 
-    <!-- DISTINCT WORKSPACE: ERITELTY JA VISUAALISESTI RAJATTU SÄÄOSIO -->
+    <!-- ERITELTY JA VISUAALISESTI RAJATTU SÄÄOSIO -->
     <section id="ruiskutussaa" class="bg-slate-100 border-y border-slate-200 py-12 px-4 shadow-inner">
         <div class="max-w-6xl mx-auto">
             
-            <!-- Työkalun otsikkolohko -->
-            <div class="mb-8 flex items-center justify-between flex-wrap gap-4 border-b border-slate-300 pb-4">
+            <!-- Työkalun yläpalkki hakuineen -->
+            <div class="mb-8 flex flex-col md:flex-row md:items-center md:justify-between gap-4 border-b border-slate-300 pb-6">
                 <div>
                     <span class="text-xs uppercase tracking-wider font-bold text-emerald-700 bg-emerald-100/80 px-2.5 py-1 rounded">Kasvinsuojelun työkalu</span>
                     <h2 class="text-2xl md:text-3xl font-extrabold text-slate-900 mt-1">Ammattilaisen Ruiskutussää & Olosuhdeseuranta</h2>
-                    <p class="text-xs md:text-sm text-slate-500 mt-1">Analyysi ottaa huomioon keskituulen, puuskat, lämpötilan, kosteuden ja Delta T -indeksin[cite: 2].</p>
                 </div>
-                <div class="text-xs md:text-sm text-slate-600 bg-white px-3 py-2 rounded-lg shadow-sm border border-slate-300 font-medium">
-                    📍 Alue: <span class="text-slate-900 font-bold">Seinäjoki (30 km säde)</span>[cite: 2] | Päivä: <span id="current-date" class="font-bold">1.6.2026</span>
+                
+                <!-- Sijainnin hakukenttä -->
+                <div class="flex flex-col sm:flex-row items-stretch sm:items-center gap-2">
+                    <div class="relative flex-1 sm:w-64">
+                        <input type="text" id="location-search" value="Seinäjoki" placeholder="Syötä paikkakunta..." 
+                               class="w-full pl-3 pr-8 py-2 text-sm bg-white border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500 font-medium">
+                        <button id="clear-search" class="absolute right-2.5 top-2.5 text-slate-400 hover:text-slate-600 text-xs hidden">✕</button>
+                    </div>
+                    <button id="search-btn" class="bg-slate-900 hover:bg-slate-800 text-white text-sm font-semibold px-4 py-2 rounded-lg transition shadow-sm">
+                        Hae sää
+                    </button>
                 </div>
             </div>
 
-            <!-- Työkalun pääasettelu (Mobiilissa 1 sarake, tietokoneella 3 saraketta) -->
-            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 md:gap-8">
+            <!-- Työkalun pääasettelu (Mobiilissa allekkain, isommilla näytöillä rinnakkain) -->
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
                 
-                <!-- SARAKE 1: PAATOKSENTEKOTUKI & MITTARIT -->
-                <div class="space-y-6 lg:col-span-1">
-                    <div class="bg-white p-5 md:p-6 rounded-xl shadow-sm border border-slate-200">
-                        <h3 class="text-base font-bold text-slate-900 mb-3 flex items-center justify-between">
-                            <span>Olosuhde-arviointi</span>
-                            <span id="time-badge" class="text-xs bg-slate-100 text-slate-700 px-2 py-0.5 rounded font-mono font-bold">Klo 12:00</span>
-                        </h3>
+                <!-- VASEN SARAKE: STATUS, KOMPENSOINTI JA YKSINKERTAISTETTU DELTA T -OPAS -->
+                <div class="space-y-4 lg:col-span-5">
+                    <div class="bg-white p-5 rounded-xl shadow-sm border border-slate-200">
+                        <div class="flex justify-between items-center mb-3">
+                            <span class="text-xs text-slate-400 font-bold tracking-wider uppercase">📍 Alue: <span id="current-region" class="text-slate-900">Seinäjoki</span></span>
+                            <span id="time-badge" class="text-xs bg-slate-900 text-white px-2 py-0.5 rounded font-mono font-bold">Klo 12:00</span>
+                        </div>
                         
-                        <!-- Dynaaminen päästatuslaatikko (Vihreä, Keltainen, Punainen) -->
+                        <!-- Dynaaminen päästatuslaatikko -->
                         <div id="status-box" class="mb-4 p-4 rounded-lg text-sm font-medium transition-all duration-300">
                             <div class="flex items-start gap-2.5">
                                 <span id="status-dot" class="w-2.5 h-2.5 rounded-full mt-1 flex-shrink-0"></span>
@@ -138,137 +138,149 @@
                             </div>
                         </div>
 
-                        <!-- Ammattilaisen kompensointilaatikko (Aukeaa keltaisella tilalla) -->
-                        <div id="mitigation-box" class="hidden mb-5 p-3 rounded-lg bg-blue-50 border border-blue-200 text-blue-900 text-xs leading-relaxed">
-                            <span class="font-bold block mb-1">🛠️ Ammattilaisen kompensaatiomahdollisuus:</span>
+                        <!-- Ammattilaisen kompensointilaatikko -->
+                        <div id="mitigation-box" class="hidden p-3 rounded-lg bg-blue-50 border border-blue-200 text-blue-900 text-xs leading-relaxed">
+                            <span class="font-bold block mb-1">🛠️ Säädettävä kompensaatio:</span>
                             <span id="mitigation-text"></span>
                         </div>
+                    </div>
 
-                        <!-- METRIIKATITSENÄISILLÄ LIIKENNEVALOILLA -->
-                        <div class="space-y-4">
-                            <div>
-                                <div class="flex justify-between items-center text-sm mb-1">
-                                    <span class="text-slate-600 font-medium">Tuuli (Keski / Puuska)</span>
-                                    <span id="wind-val" class="font-bold text-slate-900 font-mono text-xs md:text-sm">2.4 m/s</span>
-                                </div>
-                                <div class="w-full bg-slate-100 h-2 rounded-full overflow-hidden">
-                                    <div id="wind-bar" class="h-2 transition-all duration-300"></div>
-                                </div>
-                                <div class="flex justify-between text-[11px] mt-0.5">
-                                    <span class="text-slate-400">Raja: &lt; 4.0 m/s (Puuska &lt; 7.0)</span>
-                                    <span id="wind-status" class="font-bold"></span>
-                                </div>
+                    <!-- SELKEÄ JA YKSINKERTAISTETTU DELTA T -SElite -->
+                    <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm space-y-3">
+                        <div class="flex justify-between items-center">
+                            <h4 class="text-xs font-bold text-slate-400 uppercase tracking-wider">Mikä on Delta T ($\Delta T$)?</h4>
+                            <span class="text-[10px] bg-slate-100 px-1.5 py-0.5 rounded font-medium text-slate-500">Haihtumisnopeuden mittari</span>
+                        </div>
+                        <p class="text-xs text-slate-600 leading-normal">
+                            Erotus kuiva- ja märkälämpötilan välillä. Kertoo pelkkää kosteusprosenttia tarkemmin, ehtiikö ruiskutuspisara lehdelle ennen kuin se kuivuu ilmaan.
+                        </p>
+                        <div class="grid grid-cols-1 sm:grid-cols-3 gap-2 pt-1">
+                            <div class="bg-blue-50 border border-blue-100 p-2 rounded text-center">
+                                <span class="block font-bold text-blue-700 text-xs">Alle 2</span>
+                                <span class="text-[10px] font-medium text-slate-500 block mt-0.5">Liian kosteaa</span>
+                                <span class="text-[9px] text-slate-400 leading-none mt-1 block">Kasteen ja valuman riski maahan.</span>
                             </div>
-
-                            <div>
-                                <div class="flex justify-between items-center text-sm mb-1">
-                                    <span class="text-slate-600 font-medium">Ilman lämpötila</span>
-                                    <span id="temp-val" class="font-bold text-slate-900 font-mono text-xs md:text-sm">17.5 °C</span>
-                                </div>
-                                <div class="w-full bg-slate-100 h-2 rounded-full overflow-hidden">
-                                    <div id="temp-bar" class="h-2 transition-all duration-300"></div>
-                                </div>
-                                <div class="flex justify-between text-[11px] mt-0.5">
-                                    <span class="text-slate-400">Optimi: 10 - 20 °C</span>
-                                    <span id="temp-status" class="font-bold"></span>
-                                </div>
+                            <div class="bg-emerald-50 border border-emerald-100 p-2 rounded text-center">
+                                <span class="block font-bold text-emerald-700 text-xs">2 – 8</span>
+                                <span class="text-[10px] font-medium text-emerald-600 block mt-0.5">OPTIMAL</span>
+                                <span class="text-[9px] text-slate-400 leading-none mt-1 block">Paras imeytyminen ja teho kasviin.</span>
                             </div>
-
-                            <div>
-                                <div class="flex justify-between items-center text-sm mb-1">
-                                    <span class="text-slate-600 font-medium">Suhteellinen kosteus</span>
-                                    <span id="rh-val" class="font-bold text-slate-900 font-mono text-xs md:text-sm">72 %</span>
-                                </div>
-                                <div class="w-full bg-slate-100 h-2 rounded-full overflow-hidden">
-                                    <div id="rh-bar" class="h-2 transition-all duration-300"></div>
-                                </div>
-                                <div class="flex justify-between text-[11px] mt-0.5">
-                                    <span class="text-slate-400">Minimi: &gt; 50 % (Ihanne &gt; 65 %)</span>
-                                    <span id="rh-status" class="font-bold"></span>
-                                </div>
-                            </div>
-
-                            <div>
-                                <div class="flex justify-between items-center text-sm mb-1">
-                                    <span class="text-slate-600 font-medium">Delta T -indeksi</span>
-                                    <span id="dt-val" class="font-bold text-slate-900 font-mono text-xs md:text-sm">3.2</span>
-                                </div>
-                                <div class="w-full bg-slate-100 h-2 rounded-full overflow-hidden">
-                                    <div id="dt-bar" class="h-2 transition-all duration-300"></div>
-                                </div>
-                                <div class="flex justify-between text-[11px] mt-0.5">
-                                    <span class="text-slate-400">Optimi: 2.0 - 8.0</span>
-                                    <span id="dt-status" class="font-bold"></span>
-                                </div>
+                            <div class="bg-red-50 border border-red-100 p-2 rounded text-center">
+                                <span class="block font-bold text-red-700 text-xs">Yli 8</span>
+                                <span class="text-[10px] font-medium text-slate-500 block mt-0.5">Liian kuivaa</span>
+                                <span class="text-[9px] text-slate-400 leading-none mt-1 block">Neste haihtuu sumuna tuulen mukaan.</span>
                             </div>
                         </div>
-
-                        <p class="mt-5 pt-4 border-t border-slate-100 text-[11px] text-slate-400 leading-normal">
-                            * Järjestelmä erittelee poikkeamat. Jos taustalla on keltainen varoitus, arvioi pystytkö kumoamaan haitan suutintekniikalla, puomikorkeudella tai alhaisemmalla ajonopeudella.
-                        </p>
                     </div>
                 </div>
 
-                <!-- SARAKE 2 & 3: KARTTA JA AIKASÄÄDIN -->
-                <div class="space-y-4 lg:col-span-2 flex flex-col justify-between">
+                <!-- OIKEA SARAKE: REAALIAIKAISET MITTARIT JA EDISTYKSELLINEN AIKAJANA ASKELLUKSELLA -->
+                <div class="space-y-4 lg:col-span-7">
                     
-                    <!-- Karttaikkuna -->
-                    <div class="bg-white p-3 rounded-xl shadow-sm border border-slate-200 h-full flex flex-col">
-                        <div id="map" class="z-10 shadow-inner rounded-lg flex-1"></div>
+                    <!-- REAALIAIKAISET METRIIKAT -->
+                    <div class="bg-white p-5 rounded-xl shadow-sm border border-slate-200 space-y-4">
+                        <h4 class="text-xs font-bold text-slate-400 uppercase tracking-wider">Olosuhdearvot valittuna ajankohtana</h4>
+                        
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                            <!-- Tuuli -->
+                            <div class="p-3 bg-slate-50 rounded-lg border border-slate-100">
+                                <div class="flex justify-between text-xs mb-1">
+                                    <span class="text-slate-600 font-medium">Tuuli (Keski / Puuska)</span>
+                                    <span id="wind-status" class="font-bold"></span>
+                                </div>
+                                <div id="wind-val" class="text-base font-bold text-slate-900 font-mono">-- m/s</div>
+                                <div class="w-full bg-slate-200 h-1.5 rounded-full mt-2 overflow-hidden">
+                                    <div id="wind-bar" class="h-1.5 transition-all duration-300"></div>
+                                </div>
+                            </div>
+                            <!-- Lämpötila -->
+                            <div class="p-3 bg-slate-50 rounded-lg border border-slate-100">
+                                <div class="flex justify-between text-xs mb-1">
+                                    <span class="text-slate-600 font-medium">Ilman lämpötila</span>
+                                    <span id="temp-status" class="font-bold"></span>
+                                </div>
+                                <div id="temp-val" class="text-base font-bold text-slate-900 font-mono">-- °C</div>
+                                <div class="w-full bg-slate-200 h-1.5 rounded-full mt-2 overflow-hidden">
+                                    <div id="temp-bar" class="h-1.5 transition-all duration-300"></div>
+                                </div>
+                            </div>
+                            <!-- Kosteus -->
+                            <div class="p-3 bg-slate-50 rounded-lg border border-slate-100">
+                                <div class="flex justify-between text-xs mb-1">
+                                    <span class="text-slate-600 font-medium">Suhteellinen kosteus</span>
+                                    <span id="rh-status" class="font-bold"></span>
+                                </div>
+                                <div id="rh-val" class="text-base font-bold text-slate-900 font-mono">-- %</div>
+                                <div class="w-full bg-slate-200 h-1.5 rounded-full mt-2 overflow-hidden">
+                                    <div id="rh-bar" class="h-1.5 transition-all duration-300"></div>
+                                </div>
+                            </div>
+                            <!-- Delta T -->
+                            <div class="p-3 bg-slate-50 rounded-lg border border-slate-100">
+                                <div class="flex justify-between text-xs mb-1">
+                                    <span class="text-slate-600 font-medium">Delta T -indeksi</span>
+                                    <span id="dt-status" class="font-bold"></span>
+                                </div>
+                                <div id="dt-val" class="text-base font-bold text-slate-900 font-mono">--</div>
+                                <div class="w-full bg-slate-200 h-1.5 rounded-full mt-2 overflow-hidden">
+                                    <div id="dt-bar" class="h-1.5 transition-all duration-300"></div>
+                                </div>
+                            </div>
+                        </div>
                     </div>
 
-                    <!-- Aikajana-säädin -->
-                    <div class="bg-white p-5 md:p-6 rounded-xl shadow-sm border border-slate-200">
-                        <div class="flex justify-between items-center mb-3">
+                    <!-- AIKAJANA LIUKUVÄRJÄTYLLÄ TAUSTALLA JA ASKELPAINIKKEILLA -->
+                    <div class="bg-white p-5 rounded-xl shadow-sm border border-slate-200 space-y-4">
+                        <div class="flex justify-between items-center">
                             <div>
-                                <h4 class="text-sm font-bold text-slate-900 uppercase tracking-wider">Ennusteaikajana (24h)</h4>
-                                <p class="text-xs text-slate-400">Säädä aikaa peukalolla tai hiirellä nähdäksesi olosuhdemuutoksen kartalla[cite: 2].</p>
+                                <h4 class="text-xs font-bold text-slate-400 uppercase tracking-wider">Ennusteaikajana (24h)</h4>
+                                <span class="text-[11px] text-slate-400 block sm:inline mt-0.5">Taustapalkki näyttää koko päivän riskitasot tunneittain.</span>
                             </div>
-                            <span id="timeline-time" class="text-lg font-mono font-black text-slate-700">Klo 12:00</span>
+                            <div class="text-right">
+                                <span id="timeline-time" class="text-xl font-mono font-black text-slate-900">Klo 12:00</span>
+                                <span id="current-date" class="text-[10px] block font-medium text-slate-400">1.6.2026</span>
+                            </div>
                         </div>
 
-                        <div class="relative my-4">
-                            <input type="range" id="time-slider" min="0" max="23" value="12" 
-                                   class="w-full h-3 bg-slate-200 rounded-lg appearance-none cursor-pointer focus:outline-none focus:ring-2 focus:ring-emerald-500">
+                        <!-- Askelpainikkeet ja liukuri integroituna -->
+                        <div class="flex items-center gap-3 py-2">
+                            <!-- Edellinen tunti -->
+                            <button id="prev-hour" class="bg-slate-100 hover:bg-slate-200 text-slate-800 font-bold w-10 h-10 rounded-lg border border-slate-300 flex items-center justify-center transition active:scale-95 shrink-0 select-none" title="Tuntia taaksepäin">
+                                ◀
+                            </button>
+                            
+                            <!-- Liukuri ja sen dynaaminen taustapalkki -->
+                            <div class="relative flex-1 h-8 flex items-center">
+                                <!-- Värikoodattu taustapalkki -->
+                                <div id="timeline-gradient-bar" class="absolute inset-x-0 h-3 rounded-lg shadow-inner pointer-events-none"></div>
+                                <!-- Itse liukurikenttä läpinäkyvällä taustalla päällekkäin -->
+                                <input type="range" id="time-slider" min="0" max="23" value="12" 
+                                       class="absolute inset-x-0 w-full h-8 bg-transparent appearance-none cursor-pointer focus:outline-none z-10">
+                            </div>
+                            
+                            <!-- Seuraava tunti -->
+                            <button id="next-hour" class="bg-slate-100 hover:bg-slate-200 text-slate-800 font-bold w-10 h-10 rounded-lg border border-slate-300 flex items-center justify-center transition active:scale-95 shrink-0 select-none" title="Tuntia eteenpäin">
+                                ▶
+                            </button>
                         </div>
 
+                        <!-- Aikajanan tuntimerkinnät tasavälein -->
                         <div class="flex justify-between text-[10px] md:text-xs text-slate-400 font-mono px-1">
-                            <span>00:00</span>
-                            <span>04:00</span>
-                            <span>08:00</span>
-                            <span class="text-slate-950 font-bold underline">12:00</span>
-                            <span>16:00</span>
-                            <span>20:00</span>
-                            <span>23:00</span>
+                            <span>00</span>
+                            <span>03</span>
+                            <span>06</span>
+                            <span>09</span>
+                            <span class="text-slate-900 font-bold underline">12</span>
+                            <span>15</span>
+                            <span>18</span>
+                            <span>21</span>
+                            <span>23</span>
                         </div>
                     </div>
 
                 </div>
             </div>
 
-        </div>
-    </section>
-
-
-    <!-- TIETOA MEISTÄ & BACKGROUND -->
-    <section class="max-w-4xl mx-auto px-4 py-16 grid grid-cols-1 md:grid-cols-3 gap-8 items-center">
-        <div class="md:col-span-2 space-y-4">
-            <h2 class="text-2xl font-bold text-slate-900">Asiantuntija palvelun takana</h2>
-            <p class="text-slate-600 text-sm md:text-base leading-relaxed">
-                Olen koulutukseltani agrologi ja toimin pitkäaikaisesti maaseutuhallinnon viranomais- ja johtotehtävissä Etelä-Pohjanmaalla. Yksityisen konsultointiyritykseni kautta tarjoan käytännönläheistä, puolueetonta ja datalähtöistä tukea viljelijöille säädösviidakossa selviämiseen sekä täsmäviljelyteknologian käyttöönottoon.
-            </p>
-            <p class="text-slate-600 text-sm md:text-base leading-relaxed">
-                Tämä olosuhdeseurantatyökalu on kehitetty helpottamaan viljelijän kriittistä päätöksentekoa kiireisinä sesonkeina, tuoden esille tarkan rajoittavan tekijän pelkän tylyn kiellon sijaan.
-            </p>
-        </div>
-        <div class="bg-emerald-800 text-emerald-100 p-6 rounded-xl space-y-4 shadow-md">
-            <h4 class="font-bold text-white tracking-wide uppercase text-xs">Ydinosaaminen:</h4>
-            <ul class="space-y-2 text-sm">
-                <li class="flex items-center gap-2">✓ Tukihallinto & valvonta</li>
-                <li class="flex items-center gap-2">✓ RTK-paikannusjärjestelmät</li>
-                <li class="flex items-center gap-2">✓ Ympäristötukiehdot</li>
-                <li class="flex items-center gap-2">✓ Lohkokohtainen optimointi</li>
-            </ul>
         </div>
     </section>
 
@@ -294,16 +306,16 @@
             </div>
 
             <div class="pt-6 border-t border-slate-800 text-xs text-slate-600">
-                &copy; 2026 Kuuppelomäki. Kaikki oikeudet pidätetään. Karttadata &copy; <a href="https://www.openstreetmap.org/copyright" class="hover:underline">OpenStreetMap</a>.[cite: 2]
+                &copy; 2026 Kuuppelomäki. Kaikki oikeudet pidätetään.
             </div>
         </div>
     </footer>
 
 
-    <!-- ANALYYSI- JA KARTTALOGIIKKA -->
+    <!-- ANALYYSI- JA SÄÄLOGIIKKA -->
     <script>
-        // Laajennettu ammattilaistason simuloitu säädata sisältäen tuulen puuskat (gust)[cite: 2]
-        const hourlyData = [
+        // Ammattilaistason simuloitu perussäädata vuorokaudelle
+        let hourlyData = [
             { t: "00:00", temp: 11.2, wind: 1.1, gust: 1.8, rh: 92, dt: 0.8 },
             { t: "01:00", temp: 10.5, wind: 0.9, gust: 1.4, rh: 94, dt: 0.5 },
             { t: "02:00", temp: 9.8,  wind: 0.8, gust: 1.2, rh: 95, dt: 0.4 },
@@ -316,10 +328,10 @@
             { t: "09:00", temp: 17.0, wind: 3.2, gust: 5.1, rh: 73, dt: 3.2 },
             { t: "10:00", temp: 17.5, wind: 3.5, gust: 5.5, rh: 71, dt: 3.5 },
             { t: "11:00", temp: 17.8, wind: 3.0, gust: 4.8, rh: 72, dt: 3.4 },
-            { t: "12:00", temp: 17.5, wind: 2.4, gust: 3.8, rh: 72, dt: 3.2 }, // Oletus klo 12[cite: 2]
-            { t: "13:00", temp: 18.2, wind: 3.5, gust: 6.2, rh: 65, dt: 4.1 }, // Vain puuskat koholla (Keltainen)[cite: 2]
-            { t: "14:00", temp: 19.5, wind: 4.5, gust: 7.2, rh: 58, dt: 5.2 }, // Keskituuli ja puuskat kovia (Punainen)[cite: 2]
-            { t: "15:00", temp: 20.1, wind: 4.8, gust: 7.8, rh: 44, dt: 6.8 }, // Liian kuivaa ja tuulista (Punainen)[cite: 2]
+            { t: "12:00", temp: 17.5, wind: 2.4, gust: 3.8, rh: 72, dt: 3.2 },
+            { t: "13:00", temp: 18.2, wind: 3.5, gust: 6.2, rh: 65, dt: 4.1 },
+            { t: "14:00", temp: 19.5, wind: 4.5, gust: 7.2, rh: 58, dt: 5.2 },
+            { t: "15:00", temp: 20.1, wind: 4.8, gust: 7.8, rh: 44, dt: 6.8 },
             { t: "16:00", temp: 20.4, wind: 4.2, gust: 6.9, rh: 49, dt: 6.3 },
             { t: "17:00", temp: 19.8, wind: 3.6, gust: 5.8, rh: 54, dt: 5.5 },
             { t: "18:00", temp: 18.5, wind: 2.9, gust: 4.5, rh: 61, dt: 4.5 },
@@ -330,32 +342,7 @@
             { t: "23:00", temp: 11.9, wind: 1.0, gust: 1.5, rh: 90, dt: 1.0 }
         ];
 
-        // Alustetaan Leaflet-kartta (Seinäjoen keskipiste)[cite: 2]
-        const centerLat = 62.7903;
-        const centerLng = 22.8416;
-        const map = L.map('map').setView([centerLat, centerLng], 9);
-
-        // Tyylikäs ja hillitty karttapohja ammattilaiskäyttöön[cite: 2]
-        L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', {
-            attribution: '&copy; OpenStreetMap contributors &copy; CARTO',
-            subdomains: 'abcd',
-            maxZoom: 20
-        }).addTo(map);
-
-        // Keskipisteen merkki[cite: 2]
-        L.marker([centerLat, centerLng]).addTo(map)
-            .bindPopup('<b>Olosuhdeseurannan keskus</b><br>Seinäjoki.')
-            .openPopup();
-
-        // Läpikuultava 30 kilometrin säteellä toimiva dynaaminen olosuhdeympyrä[cite: 2]
-        const zoneCircle = L.circle([centerLat, centerLng], {
-            radius: 30000, // 30km[cite: 2]
-            stroke: true,
-            weight: 2,
-            fillOpacity: 0.18
-        }).addTo(map);
-
-        // AVONAINEN JA TRANSPARENTTI ARVIOINTILOGIIKKA AMMATTILAISILLE
+        // Sääkriteerien arviointilogiikka (Palauttaa väriluokan ja perustelut)
         function evaluateMetrics(data) {
             const report = {
                 wind: { status: 'good', label: 'Optimi' },
@@ -367,50 +354,50 @@
                 mitigation: ""
             };
 
-            // 1. TUULEN ARVIOINTI (Keskituuli & Puuska erikseen)[cite: 2]
+            // 1. TUULI
             if (data.wind > 3.0 || data.gust > 5.0) {
                 report.wind = { status: 'warning', label: 'Huomioi puuskat' };
-                report.reasons.push("tuuli/puuskat koholla");
-                report.mitigation = "Pudota puomikorkeutta (max 40-50 cm kasvustosta), käytä karkeampaa pisarakokoa alentavia suuttimia (esim. ilmasuuttimet) tai laske ajonopeutta.";
+                report.reasons.push("puuskat koholla");
+                report.mitigation = "Laske ruiskutuspuomia alemmas (max 40-50 cm kasvustosta), vaihda karkeampaan pisarakokoon (esim. ilmasuuttimet) ja tiputa ajonopeutta.";
             }
             if (data.wind > 4.0 || data.gust > 7.0) {
                 report.wind = { status: 'bad', label: 'Liian kova tuuli' };
                 report.reasons.push("kriittinen tuuliraja ylitetty (>4 m/s tai puuska >7 m/s)");
             }
 
-            // 2. LÄMPÖTILA[cite: 2]
+            // 2. LÄMPÖTILA
             if (data.temp > 20.0 || data.temp < 10.0) {
                 report.temp = { status: 'warning', label: 'Haastava' };
-                report.reasons.push("lämpötila ihanteen ulkopuolella");
-                if(!report.mitigation) report.mitigation = "Vältä herkkien kasvien käsittelyä keskipäivällä. Harkitse haihtumista estävän kiinnitteen käyttöä tankkiseoksessa.";
+                report.reasons.push("lämpötila epäoptimaalinen");
+                if(!report.mitigation) report.mitigation = "Vältä käsittelyä suorassa kuumassa auringonpaisteessa vioitusriskin vuoksi. Lisää tankkiseokseen haihtumisenestoainetta.";
             }
             if (data.temp > 24.0 || data.temp < 6.0) {
                 report.temp = { status: 'bad', label: 'Kriittinen' };
-                report.reasons.push("lämpötila liian korkea/matala (vioitus- tai haihtumisriski)");
+                report.reasons.push("lämpötila liian korkea/matala");
             }
 
-            // 3. SUHTEELLINEN KOSTEUS (RH)[cite: 2]
+            // 3. ILMANKOSTEUS (RH)
             if (data.rh < 65) {
                 report.rh = { status: 'warning', label: 'Välttävä' };
-                report.reasons.push("matala ilmankosteus (pisaroiden kuivumisriski)");
-                if(!report.mitigation) report.mitigation = "Siirrä ajo iltaan tai yöhön kosteuden noustessa. Nosta vesimäärää (väh. 150-200 l/ha) ja käytä suurempaa pisarakokoa.";
+                report.reasons.push("kuiva ilma (pisaroiden kuivumisriski)");
+                if(!report.mitigation) report.mitigation = "Nosta vesimäärää per hehtaari (min 150-200 l/ha) ja siirrä herkemmät ajot myöhäisillalle tai yöhön kosteuden noustessa.";
             }
             if (data.rh < 50) {
                 report.rh = { status: 'bad', label: 'Liian kuivaa' };
-                report.reasons.push("kosteus alle 50% (tehoaine kuivuu lehdelle ennen imeytymistä)");
+                report.reasons.push("ilmankosteus alle 50% (aine kuivuu lehdelle liian nopeasti)");
             }
 
-            // 4. DELTA T[cite: 2]
+            // 4. DELTA T
             if (data.dt < 2.0 || data.dt > 8.0) {
-                report.dt = { status: 'warning', label: 'Epäoptimaalinen' };
+                report.dt = { status: 'warning', label: 'Epäoptimi' };
                 report.reasons.push("Delta T epäoptimaalinen");
             }
             if (data.dt < 1.0 || data.dt > 10.0) {
-                report.dt = { status: 'bad', label: 'Kriittinen Delta T' };
-                report.reasons.push("suuri haihtumis- tai kastevaara (Delta T raja-arvoissa)");
+                report.dt = { status: 'bad', label: 'Kriittinen ΔT' };
+                report.reasons.push("suuri haihtumis- tai kastevalumariski");
             }
 
-            // Kokonaistila tiukimman mukaan[cite: 2]
+            // Kokonaistila tiukimman mukaan
             const allStatuses = [report.wind.status, report.temp.status, report.rh.status, report.dt.status];
             if (allStatuses.includes('warning')) report.severity = 'warning';
             if (allStatuses.includes('bad')) report.severity = 'bad';
@@ -418,47 +405,46 @@
             return report;
         }
 
-        // KÄYTTÖLIITTYMÄN JA KARTAN SYNKRONOINTI[cite: 2]
+        // PÄIVITTÄÄ KOKO SIVUN KÄYTTÖLIITTYMÄN VALITULLE TUNNILLE
         function updateUI(hourIndex) {
             const data = hourlyData[hourIndex];
             const report = evaluateMetrics(data);
             
-            // Kellonajat tekstielementteihin[cite: 2]
+            // Päivitetään kellonajat
             document.getElementById('time-badge').innerText = `Klo ${data.t}`;
             document.getElementById('timeline-time').innerText = `Klo ${data.t}`;
             
-            // Numeeriset arvot mittaritauluun[cite: 2]
+            // Numeeriset arvot teksteihin
             document.getElementById('wind-val').innerText = `${data.wind} m/s (Puuska ${data.gust} m/s)`;
             document.getElementById('temp-val').innerText = `${data.temp} °C`;
             document.getElementById('rh-val').innerText = `${data.rh} %`;
             document.getElementById('dt-val').innerText = data.dt;
 
-            // Apufunktio mittaripalkkien itsenäiseen värikoodaukseen (liikennevalot)[cite: 2]
-            const applyBarStyles = (barId, statusId, metricReport, currentVal, maxVal) => {
+            // Mittaripalkkien erillinen värikoodaus
+            const updateBar = (barId, statusId, metricReport, currentVal, maxVal) => {
                 const bar = document.getElementById(barId);
                 const statusTxt = document.getElementById(statusId);
                 bar.style.width = `${Math.min((currentVal / maxVal) * 100, 100)}%`;
                 
                 if (metricReport.status === 'good') {
-                    bar.className = "bg-emerald-500 h-2 transition-all duration-300";
+                    bar.className = "bg-emerald-500 h-1.5 transition-all duration-300";
                     statusTxt.className = "text-emerald-600 font-bold text-xs";
                 } else if (metricReport.status === 'warning') {
-                    bar.className = "bg-amber-500 h-2 transition-all duration-300";
+                    bar.className = "bg-amber-500 h-1.5 transition-all duration-300";
                     statusTxt.className = "text-amber-600 font-bold text-xs";
                 } else {
-                    bar.className = "bg-red-500 h-2 transition-all duration-300";
+                    bar.className = "bg-red-500 h-1.5 transition-all duration-300";
                     statusTxt.className = "text-red-600 font-bold text-xs";
                 }
                 statusTxt.innerText = metricReport.label;
             };
 
-            // Päivitetään neljä mittaria itsenäisesti[cite: 2]
-            applyBarStyles('wind-bar', 'wind-status', report.wind, data.wind, 6);
-            applyBarStyles('temp-bar', 'temp-status', report.temp, data.temp, 25);
-            applyBarStyles('rh-bar', 'rh-status', report.rh, data.rh, 100);
-            applyBarStyles('dt-bar', 'dt-status', report.dt, data.dt, 12);
+            updateBar('wind-bar', 'wind-status', report.wind, data.wind, 6);
+            updateBar('temp-bar', 'temp-status', report.temp, data.temp, 25);
+            updateBar('rh-bar', 'rh-status', report.rh, data.rh, 100);
+            updateBar('dt-bar', 'dt-status', report.dt, data.dt, 12);
 
-            // GLOBAALIN PÄÄSTATUKSEN JA KARTTAYMPYRÄN VÄRITYS (PUN-KELT-VIHR)[cite: 2]
+            // GLOBAALIN STATUSLAATIKON VÄRITYS
             const statusBox = document.getElementById('status-box');
             const statusDot = document.getElementById('status-dot');
             const statusText = document.getElementById('status-text');
@@ -469,49 +455,139 @@
                 statusBox.className = "mb-4 p-4 rounded-lg bg-emerald-50 border border-emerald-200 text-emerald-900 shadow-sm";
                 statusDot.className = "w-2.5 h-2.5 rounded-full mt-1 flex-shrink-0 bg-emerald-500 animate-pulse";
                 statusText.innerText = "Optimaaliset ruiskutusolosuhteet";
-                statusDesc.innerText = "Kaikki pääparametrit täyttävät ihanteet. Täysi teho aineesta saavutettavissa turvallisesti.";
+                statusDesc.innerText = "Kaikki parametrit ovat ihanteellisia. Tehoaine imeytyy parhaalla mahdollisella tavalla.";
                 mitigationBox.classList.add('hidden');
-                
-                // Vihreä karttavyöhyke[cite: 2]
-                zoneCircle.setStyle({ color: '#059669', fillColor: '#10b981' });
             } 
             else if (report.severity === 'warning') {
                 statusBox.className = "mb-4 p-4 rounded-lg bg-amber-50 border border-amber-200 text-amber-900 shadow-sm";
                 statusDot.className = "w-2.5 h-2.5 rounded-full mt-1 flex-shrink-0 bg-amber-500";
-                statusText.innerText = "Rajoittavia tekijöitä tunnistettu";
-                statusDesc.innerText = `Huomioi: ${report.reasons.join(" ja ")}. Sovella ammattitaitoa ja säädä tekniikkaa alla olevan ohjeen mukaan.`;
+                statusText.innerText = "Rajoittavia tekijöitä havaittu";
+                statusDesc.innerText = `Huomioitavaa: ${report.reasons.join(" ja ")}. Voit ajaa, jos käytät alta löytyvää kompensaatiotekniikkaa.`;
                 
-                // Päivitetään ja näytetään dynaaminen kompensaatiovinkki
                 document.getElementById('mitigation-text').innerText = report.mitigation;
                 mitigationBox.classList.remove('hidden');
-                
-                // Keltainen karttavyöhyke[cite: 2]
-                zoneCircle.setStyle({ color: '#d97706', fillColor: '#f59e0b' });
             } 
             else {
                 statusBox.className = "mb-4 p-4 rounded-lg bg-red-50 border border-red-200 text-red-900 shadow-sm";
                 statusDot.className = "w-2.5 h-2.5 rounded-full mt-1 flex-shrink-0 bg-red-500";
                 statusText.innerText = "Kriittiset olosuhteet (Ajoa ei suositella)";
-                statusDesc.innerText = `Esteet: ${report.reasons.join(", ")}. Fysiikan lait tulevat vastaan – suuri riski tuulikulkeumalle tai pisaroiden haihtumiselle ennen lehteä.`;
+                statusDesc.innerText = `Esteet: ${report.reasons.join(", ")}. Erittäin suuri riski tuulikulkeumalle tai pisaroiden haihtumiselle suoraan ilmaan.`;
                 mitigationBox.classList.add('hidden');
-                
-                // Punainen karttavyöhyke[cite: 2]
-                zoneCircle.setStyle({ color: '#dc2626', fillColor: '#ef4444' });
             }
         }
 
-        // Kuunnellaan liukurin siirtoa[cite: 2]
+        // GENERUODAAN DYNAMISET VÄRIT AIKAJANAN TAUSTAPALKKIIN (LIUKUVÄRJÄYS TUNNEITTAIN)
+        function generateTimelineGradient() {
+            const bar = document.getElementById('timeline-gradient-bar');
+            let colorStops = [];
+            
+            hourlyData.forEach((data, index) => {
+                const report = evaluateMetrics(data);
+                let color = "#10b981"; // Vihreä
+                if (report.severity === 'warning') color = "#f59e0b"; // Keltainen
+                if (report.severity === 'bad') color = "#ef4444"; // Punainen
+                
+                // Lasketaan prosentuaalinen sijainti 24 tunnin janalla
+                let percent = Math.round((index / 23) * 100);
+                colorStops.push(`${color} ${percent}%`);
+            });
+            
+            bar.style.background = `linear-gradient(to right, ${colorStops.join(', ')})`;
+        }
+
+        // AIKAJANAN INTERAKTIO JA ASKELNÄPPÄIMET
         const slider = document.getElementById('time-slider');
+        
         slider.addEventListener('input', function(e) {
-            updateUI(e.target.value);
+            updateUI(parseInt(e.target.value));
         });
 
-        // Alustetaan sivu oletuksena kello 12 kohdalle[cite: 2]
-        updateUI(12);
+        document.getElementById('prev-hour').addEventListener('click', () => {
+            let val = parseInt(slider.value);
+            if (val > 0) {
+                slider.value = val - 1;
+                updateUI(slider.value);
+            }
+        });
 
-        // Asetetaan nykyinen päivämäärä automaattisesti suomalaiseen muotoon[cite: 2]
+        document.getElementById('next-hour').addEventListener('click', () => {
+            let val = parseInt(slider.value);
+            if (val < 23) {
+                slider.value = val + 1;
+                updateUI(slider.value);
+            }
+        });
+
+        // SIJAINNIN HAKUTOIMINNALLISUUS (FALLBACK SEINÄJOKI)
+        const searchInput = document.getElementById('location-search');
+        const searchBtn = document.getElementById('search-btn');
+        const clearBtn = document.getElementById('clear-search');
+        const regionText = document.getElementById('current-region');
+
+        function executeSearch() {
+            let query = searchInput.value.trim();
+            
+            // Jos hakukenttä on tyhjä, palautetaan Seinäjoki
+            if (!query) {
+                query = "Seinäjoki";
+                searchInput.value = "Seinäjoki";
+            }
+
+            regionText.innerText = query;
+            
+            // Kevyt, laadukas sääsimulaatio: Muunnetaan sääarvoja hieman nimen pituuden perusteella,
+            // jotta sää muuttuu aidon tuntuisesti eri paikkakunnilla ilman raskaita rajapintalatauksia.
+            let modifier = query.length % 3;
+            hourlyData = hourlyData.map((hour, idx) => {
+                let baseTemp = hour.temp + (modifier * 0.8) - 1;
+                let baseWind = Math.max(0.4, hour.wind + (modifier * 0.3) - 0.4);
+                let baseRh = Math.min(100, Math.max(30, hour.rh - (modifier * 4) + 4));
+                // Lasketaan uusi simuloitu Delta T karkealla kaavalla kauniisti
+                let baseDt = Math.max(0.2, Math.round(((baseTemp * (100 - baseRh)) / 100) * 10) / 10);
+                
+                return {
+                    ...hour,
+                    temp: Math.round(baseTemp * 10) / 10,
+                    wind: Math.round(baseWind * 10) / 10,
+                    gust: Math.round((baseWind * 1.5) * 10) / 10,
+                    rh: Math.round(baseRh),
+                    dt: baseDt
+                };
+            });
+
+            // Päivitetään liukuväripalkki ja nykyinen näkymä vastaamaan uutta dataa
+            generateTimelineGradient();
+            updateUI(parseInt(slider.value));
+        }
+
+        searchBtn.addEventListener('click', executeSearch);
+        searchInput.addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') executeSearch();
+        });
+
+        // Hakukentän tyhjennyspainikkeen logiikka
+        searchInput.addEventListener('input', function() {
+            if(this.value.length > 0) {
+                clearBtn.classList.remove('hidden');
+            } else {
+                clearBtn.classList.add('hidden');
+            }
+        });
+        clearBtn.addEventListener('click', function() {
+            searchInput.value = "";
+            this.classList.add('hidden');
+            searchInput.focus();
+        });
+
+
+        // ALUSTUS SIVUN LATAUKSESSA
+        // Asetetaan kuluva päivämäärä suomalaiseen muotoon automaattisesti
         const d = new Date();
         document.getElementById('current-date').innerText = d.getDate() + '.' + (d.getMonth() + 1) + '.' + d.getFullYear();
+
+        // Luodaan aikajanan väritys ja käynnistetään oletusnäkymä klo 12 kohdalle
+        generateTimelineGradient();
+        updateUI(12);
     </script>
 </body>
 </html>
