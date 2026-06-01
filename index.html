@@ -4,7 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Kuuppelomäki — Maatalouden palvelut & Sääennakointi</title>
-  <meta name="description" content="Kuuppelomäki — maatalouden tukineuvonta, RTK-tukiasema ja ruiskutussään ennakointipalvelu.">
+  <meta name="description" content="Kuuppelomäki — maatalouden tukineuvonta, RTK-tukiasema ja ruiskutussään ennakointipalvelu Seinäjoella.">
   
   <style>
     /* --- 1. DESIGN SYSTEM & MUUTTUJAT --- */
@@ -15,12 +15,10 @@
       --text-main: #1e293b;
       --text-muted: #64748b;
       
-      /* Brändivärit */
       --accent: #16a34a; 
       --accent-hover: #15803d;
       --accent-dim: #f0fdf4;
       
-      /* Tilavärit (Sääindikaattorit) */
       --color-success: #16a34a;
       --color-warning: #d97706;
       --color-danger: #dc2626;
@@ -56,7 +54,6 @@
       padding: 0 20px;
     }
     
-    /* --- 3. KORREKTI TYPOGRAFIA --- */
     header { 
       text-align: center; 
       margin-bottom: 40px; 
@@ -107,8 +104,6 @@
       margin: 24px 0 12px 0;
     }
     
-    /* --- 4. KOMPONENTIT --- */
-    /* Listat */
     ul.services-list { 
       list-style: none; 
     }
@@ -136,79 +131,7 @@
       font-weight: 600;
       margin-top: 8px;
     }
-
-    /* Säänhallintapaneeli */
-    .location-controls {
-      display: flex;
-      flex-direction: column;
-      gap: 12px;
-      margin-bottom: 20px;
-      background: var(--bg-neutral);
-      padding: 16px;
-      border-radius: var(--radius-md);
-      border: 1px solid var(--border);
-    }
     
-    .preset-buttons {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 8px;
-    }
-    
-    .btn {
-      background: var(--bg-card);
-      border: 1px solid var(--border);
-      padding: 8px 14px;
-      border-radius: var(--radius-sm);
-      cursor: pointer;
-      font-size: 0.95em;
-      font-weight: 500;
-      color: var(--text-main);
-      transition: var(--transition);
-    }
-    
-    .btn:hover {
-      background: #f1f5f9;
-      border-color: #cbd5e1;
-    }
-    
-    .btn.active {
-      background: var(--accent);
-      color: white;
-      border-color: var(--accent);
-    }
-    
-    .search-box {
-      display: flex;
-      gap: 8px;
-    }
-    
-    .search-input {
-      flex: 1;
-      padding: 8px 12px;
-      border: 1px solid var(--border);
-      border-radius: var(--radius-sm);
-      font-size: 0.95em;
-      outline: none;
-      transition: var(--transition);
-    }
-
-    .search-input:focus {
-      border-color: var(--accent);
-      box-shadow: 0 0 0 2px var(--accent-dim);
-    }
-    
-    .btn-search {
-      background: #0f172a;
-      color: white;
-      border: none;
-    }
-    
-    .btn-search:hover {
-      background: #1e293b;
-    }
-    
-    /* Taulukot */
     .data-table {
       width: 100%;
       border-collapse: collapse;
@@ -229,31 +152,79 @@
       font-style: italic;
       padding: 10px 0;
     }
-    
-    .location-text {
-      color: var(--text-muted);
-      font-size: 0.9rem;
-      display: inline-block;
+
+    .location-banner {
+      background: var(--bg-neutral);
+      padding: 10px 16px;
+      border-radius: var(--radius-sm);
+      font-size: 0.95rem;
+      margin-bottom: 16px;
+      border: 1px solid var(--border);
     }
     
-    /* Ruiskugraafiikka */
+    /* --- HILLITYMPI RUISKUTUSKOMPONENTTI --- */
     .sprayer-container {
-      text-align: center;
-      margin: 20px 0;
+      display: flex;
+      align-items: center;
+      gap: 20px;
+      background: var(--bg-neutral);
+      padding: 16px;
+      border-radius: var(--radius-md);
+      margin: 15px 0;
+      border: 1px solid var(--border);
     }
     
     .sprayer-svg {
-      width: 100%;
-      max-width: 420px;
+      width: 110px; /* Pienennetty ja hillitty */
       height: auto;
-      border-radius: var(--radius-md);
-      filter: drop-shadow(0px 4px 6px rgba(0,0,0,0.06));
+      flex-shrink: 0;
+      filter: drop-shadow(0px 2px 4px rgba(0,0,0,0.05));
     }
     
     .sprayer-text {
       font-weight: 700;
-      margin-top: 12px;
       font-size: 1.1rem;
+      line-height: 1.3;
+    }
+
+    /* --- AIKAJANA --- */
+    .timeline-scroll {
+      overflow-x: auto;
+      padding-bottom: 8px;
+      margin: 15px 0;
+    }
+
+    .timeline-container {
+      display: flex;
+      gap: 8px;
+    }
+
+    .timeline-item {
+      flex: 0 0 75px;
+      text-align: center;
+      padding: 10px 6px;
+      border-radius: var(--radius-sm);
+      border: 1px solid var(--border);
+      font-size: 0.8rem;
+    }
+
+    .timeline-item .time { font-weight: 700; margin-bottom: 4px; display: block; }
+    .timeline-item .temp { font-weight: 600; display: block; }
+    .timeline-item .wind { color: var(--text-muted); font-size: 0.75rem; display: block; }
+
+    .t-good { background-color: #dcfce7; color: #15803d; border-color: #bbf7d0; }
+    .t-warning { background-color: #fef3c7; color: #b45309; border-color: #fde68a; }
+    .t-bad { background-color: #fee2e2; color: #b91c1c; border-color: #fca5a5; }
+
+    /* Ennakointilaatikko */
+    .window-prediction-box {
+      background: #eff6ff;
+      border-left: 4px solid #3b82f6;
+      padding: 14px 16px;
+      border-radius: var(--radius-sm);
+      margin: 15px 0;
+      font-weight: 600;
+      font-size: 1rem;
     }
     
     /* Perustelulaatikot */
@@ -295,7 +266,6 @@
       font-size: 0.95rem;
     }
 
-    /* Napit ja yhteystiedot */
     .contact-info p {
       margin: 8px 0;
     }
@@ -367,31 +337,22 @@
       <h2>🌾 Sään ennakointipalvelu ruiskutuksille</h2>
       <p>Laske optimiolosuhteet kasvinsuojeluaineiden levitykseen reaaliaikaisen säädatan pohjalta.</p>
       
-      <div class="location-controls">
-        <div>
-          <span class="location-text" id="location">Haetaan automaattista sijaintia...</span>
-        </div>
-        
-        <div class="preset-buttons">
-          <button class="btn" onclick="usePreset(62.4917, 22.5649, 'Jalasjärvi')">Jalasjärvi</button>
-          <button class="btn" onclick="usePreset(62.7877, 22.8448, 'Seinäjoki')">Seinäjoki</button>
-          <button class="btn" onclick="usePreset(62.9663, 23.0079, 'Lapua')">Lapua</button>
-          <button class="btn" onclick="usePreset(60.2055, 24.6559, 'Espoo')">Espoo</button>
-        </div>
-
-        <div class="search-box">
-          <input type="text" id="citySearch" class="search-input" placeholder="Hae muu paikkakunta..." onkeydown="if(event.key === 'Enter') searchLocation()">
-          <button class="btn btn-search" onclick="searchLocation()">Hae</button>
-        </div>
+      <div class="location-banner">
+        📍 Ennusteen sijainti: <b>Seinäjoki</b> (62.79°, 22.84°)
       </div>
 
       <h3>⚡ Hätääsimmät kattoo tästä</h3>
       <div id="simpleView" class="loading">Haetaan säätietoja...</div>
       <div id="simpleStatus"></div>
+      <div id="windowPrediction"></div>
+
+      <h3>📅 Seuraavat 24 tuntia aikajanalla</h3>
+      <div class="timeline-scroll">
+        <div id="timelineContainer" class="timeline-container"></div>
+      </div>
 
       <h3>📊 Tästä sitte hartaurella...</h3>
       <div id="proView" class="loading">Haetaan säätietoja...</div>
-      <div id="proStatus"></div>
       <div id="reasoning"></div>
     </section>
 
@@ -410,58 +371,10 @@
   </div>
 
   <script>
-    // Alustetaan sähköinen paikannus heti ladattaessa
-    navigator.geolocation.getCurrentPosition(
-        geolocationSuccess,
-        geolocationError,
-        { enableHighAccuracy: true, timeout: 8000 }
-    );
-
-    function geolocationError(err) {
-        document.getElementById("location").innerHTML =
-            "❌ Automaattista sijaintia ei saatu. Valitse alta paikkakunta tai hae nimellä.";
-        usePreset(62.4917, 22.5649, 'Jalasjärvi');
-    }
-
-    function geolocationSuccess(position) {
-        const lat = position.coords.latitude;
-        const lon = position.coords.longitude;
-        fetchWeatherData(lat, lon, `Oma sijainti (${lat.toFixed(2)}, ${lon.toFixed(2)})`);
-    }
-
-    function usePreset(lat, lon, name) {
-        const buttons = document.querySelectorAll('.preset-buttons .btn');
-        buttons.forEach(btn => {
-            if(btn.innerText === name) {
-                btn.classList.add('active');
-            } else {
-                btn.classList.remove('active');
-            }
-        });
-        fetchWeatherData(lat, lon, name);
-    }
-
-    async function searchLocation() {
-        const query = document.getElementById("citySearch").value.trim();
-        if (!query) return;
-
-        document.getElementById("location").innerHTML = `Etsitään kohdetta "${query}"...`;
-        
-        try {
-            const res = await fetch(`https://geocoding-api.open-meteo.com/v1/search?name=${encodeURIComponent(query)}&count=1&language=fi&format=json`);
-            const data = await res.json();
-            
-            if (data.results && data.results.length > 0) {
-                const result = data.results[0];
-                document.querySelectorAll('.preset-buttons .btn').forEach(b => b.classList.remove('active'));
-                fetchWeatherData(result.latitude, result.longitude, result.name);
-            } else {
-                document.getElementById("location").innerHTML = `❌ Kohdetta "${query}" ei löytynyt.`;
-            }
-        } catch (e) {
-            document.getElementById("location").innerHTML = "❌ Virhe sijainnin haussa.";
-        }
-    }
+    // Suora ajo Seinäjoen koordinaateilla sivun latautuessa
+    window.addEventListener('DOMContentLoaded', () => {
+        fetchWeatherData(62.7877, 22.8448);
+    });
 
     function getSprayerGraphic(statusClass) {
         let backgroundColor = '';
@@ -478,7 +391,7 @@
 
         if (statusClass === 'good') {
             backgroundColor = 'var(--color-success)'; 
-            textContent = "Hyvä keli päästää menöhön! (Erinomainen sää)";
+            textContent = "Menehän jo! Puomit levillä (Erinomainen sää)";
             boomDrawings = `
                 ${baseTractor}
                 <path d="M128,110 L20,120 M128,125 L20,123 M20,120 L20,123" stroke="white" stroke-width="3" stroke-linecap="round" fill="none" />
@@ -490,7 +403,7 @@
         } 
         else if (statusClass === 'warning') {
             backgroundColor = 'var(--color-warning)'; 
-            textContent = "Niin ja näin, ehkä paree orottaa... (Kohtalainen sää)";
+            textContent = "Ota varoen ja säädä paineet. Puolitila (Kohtalainen sää)";
             boomDrawings = `
                 ${baseTractor}
                 <path d="M124,125 L124,40 M112,125 L112,40 M112,40 L124,40" stroke="white" stroke-width="3" stroke-linecap="round" fill="none" />
@@ -502,7 +415,7 @@
         } 
         else {
             backgroundColor = 'var(--color-danger)'; 
-            textContent = "Pirä vehkehet laros, ei ny voi ajaa... (Ei suositella)";
+            textContent = "Pysy hallis. Puomit pystyssä (Ei suositella)";
             boomDrawings = `
                 ${baseTractor}
                 <path d="M124,125 L124,40 M112,125 L112,40 M112,40 L124,40" stroke="white" stroke-width="3" stroke-linecap="round" fill="none" />
@@ -523,18 +436,31 @@
         `;
     }
 
-    async function fetchWeatherData(lat, lon, locationName) {
-        document.getElementById("location").innerHTML = `📍 Kohde: <b>${locationName}</b> (${lat.toFixed(3)}, ${lon.toFixed(3)})`;
+    // Apufunktio olosuhteiden arviointiin yksittäisellä tunnilla
+    function evaluateConditions(temp, humidity, wind, gust, rain3h) {
+        const isExcellent = (wind <= 3 && gust <= 5 && rain3h === 0 && humidity >= 65 && temp >= 10 && temp <= 20);
+        const isModerate = (wind <= 5 && gust <= 7 && rain3h < 0.2 && humidity >= 50 && temp >= 6 && temp <= 24);
         
+        if (isExcellent) return "good";
+        if (isModerate) return "warning";
+        return "bad";
+    }
+
+    async function fetchWeatherData(lat, lon) {
         const simpleView = document.getElementById("simpleView");
         const proView = document.getElementById("proView");
+        const timelineContainer = document.getElementById("timelineContainer");
+        const windowPrediction = document.getElementById("windowPrediction");
         
         simpleView.innerHTML = "Lasketaan indeksejä...";
         proView.innerHTML = "Lasketaan indeksejä...";
+        timelineContainer.innerHTML = "";
 
+        // Haetaan pidempi tuntikohtainen data aikajanan ja ennakoinnin rakentamiseen
         const url = `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}` +
                     `&current=temperature_2m,relative_humidity_2m,dew_point_2m,wind_speed_10m,wind_gusts_10m` +
-                    `&hourly=precipitation&forecast_hours=4&timezone=auto`;
+                    `&hourly=temperature_2m,relative_humidity_2m,wind_speed_10m,wind_gusts_10m,precipitation` +
+                    `&timezone=auto`;
 
         try {
             const response = await fetch(url);
@@ -542,93 +468,146 @@
             
             const data = await response.json();
 
-            const temp = data.current.temperature_2m;
-            const humidity = data.current.relative_humidity_2m;
-            const dew = data.current.dew_point_2m;
-            const wind = data.current.wind_speed_10m;
-            const gust = data.current.wind_gusts_10m;
+            // Nykyhetken säätiedot
+            const currentTemp = data.current.temperature_2m;
+            const currentHumidity = data.current.relative_humidity_2m;
+            const currentDew = data.current.dew_point_2m;
+            const currentWind = data.current.wind_speed_10m;
+            const currentGust = data.current.wind_gusts_10m;
 
-            const rain1 = data.hourly.precipitation[1] || 0;
-            const rain2 = data.hourly.precipitation[2] || 0;
-            const rain3 = data.hourly.precipitation[3] || 0;
-            const rain3h = rain1 + rain2 + rain3;
+            // Etsitään nykyhetkeä vastaava indeksi tuntitiedoista
+            const currentHourStr = data.current.time;
+            const startIndex = data.hourly.time.indexOf(currentHourStr);
+            const validStartIndex = startIndex !== -1 ? startIndex : 0;
 
-            // Indeksilogiikka suomalaisille olosuhteille
-            const isExcellent = (wind <= 3 && gust <= 5 && rain3h === 0 && humidity >= 65 && temp >= 10 && temp <= 20);
-            const isModerate = (wind <= 5 && gust <= 7 && rain3h < 0.2 && humidity >= 50 && temp >= 6 && temp <= 24);
+            // Lasketaan 3 tunnin sadekertymä nykyhetkelle
+            const rain1 = data.hourly.precipitation[validStartIndex] || 0;
+            const rain2 = data.hourly.precipitation[validStartIndex+1] || 0;
+            const rain3 = data.hourly.precipitation[validStartIndex+2] || 0;
+            const currentRain3h = rain1 + rain2 + rain3;
 
-            let finalClass = "bad";
-            if (isExcellent) {
-                finalClass = "good";
-            } else if (isModerate) {
-                finalClass = "warning";
-            }
+            // Nykyhetken status
+            const currentStatus = evaluateConditions(currentTemp, currentHumidity, currentWind, currentGust, currentRain3h);
 
             // --- HÄTÄÄSIMMÄT ---
             simpleView.innerHTML = `
                 <table class="data-table">
-                    <tr><td>🌡 Ilman lämpötila</td><td><b>${temp} °C</b></td></tr>
-                    <tr><td>💨 Keskituuli</td><td><b>${wind} m/s</b></td></tr>
-                    <tr><td>🌧 Ennustettu sade (3h)</td><td><b>${rain3h.toFixed(1)} mm</b></td></tr>
+                    <tr><td>🌡 Ilman lämpötila</td><td><b>${currentTemp} °C</b></td></tr>
+                    <tr><td>💨 Keskituuli</td><td><b>${currentWind} m/s</b></td></tr>
+                    <tr><td>🌧 Ennustettu sadekertymä (3h)</td><td><b>${currentRain3h.toFixed(1)} mm</b></td></tr>
                 </table>
             `;
-            document.getElementById("simpleStatus").innerHTML = getSprayerGraphic(finalClass);
+            document.getElementById("simpleStatus").innerHTML = getSprayerGraphic(currentStatus);
 
-            // --- HARTAURELLA ---
+            // --- TULEVAN IKKUNAN ENNAKOINTI ---
+            if (currentStatus === "good" || currentStatus === "warning") {
+                windowPrediction.innerHTML = `<div class="window-prediction-box" style="border-left-color: var(--color-success); background: var(--accent-dim);">✅ Olosuhteet ovat parhaillaan kelvolliset ruiskutukselle!</div>`;
+            } else {
+                let hoursUntilSuitable = -1;
+                for (let k = 1; k <= 48; k++) {
+                    const idx = validStartIndex + k;
+                    if (!data.hourly.time[idx]) break;
+
+                    const tTemp = data.hourly.temperature_2m[idx];
+                    const tHum = data.hourly.relative_humidity_2m[idx];
+                    const tWind = data.hourly.wind_speed_10m[idx];
+                    const tGust = data.hourly.wind_gusts_10m[idx];
+                    const tRain3h = (data.hourly.precipitation[idx] || 0) + (data.hourly.precipitation[idx+1] || 0) + (data.hourly.precipitation[idx+2] || 0);
+
+                    const tStatus = evaluateConditions(tTemp, tHum, tWind, tGust, tRain3h);
+                    if (tStatus === "good" || tStatus === "warning") {
+                        hoursUntilSuitable = k;
+                        break;
+                    }
+                }
+
+                if (hoursUntilSuitable !== -1) {
+                    const targetTimeStr = data.hourly.time[validStartIndex + hoursUntilSuitable].split('T')[1];
+                    windowPrediction.innerHTML = `<div class="window-prediction-box">⏳ Olosuhteet muuttuvat kelvollisiksi <b>${hoursUntilSuitable}</b> tunnin päästä (klo ${targetTimeStr}).</div>`;
+                } else {
+                    windowPrediction.innerHTML = `<div class="window-prediction-box" style="border-left-color: var(--color-danger); background: #fef2f2;">❌ Seuraavan 48 tunnin aikana ei ole luvassa kelvollisia ruiskutusolosuhteita.</div>`;
+                }
+            }
+
+            // --- 24H AIKAJANA ---
+            let timelineHTML = "";
+            for (let i = 0; i < 24; i++) {
+                const idx = validStartIndex + i;
+                if (!data.hourly.time[idx]) break;
+
+                const timeLabel = data.hourly.time[idx].split('T')[1];
+                const hTemp = data.hourly.temperature_2m[idx];
+                const hHum = data.hourly.relative_humidity_2m[idx];
+                const hWind = data.hourly.wind_speed_10m[idx];
+                const hGust = data.hourly.wind_gusts_10m[idx];
+                const hRain3h = (data.hourly.precipitation[idx] || 0) + (data.hourly.precipitation[idx+1] || 0) + (data.hourly.precipitation[idx+2] || 0);
+
+                const hStatus = evaluateConditions(hTemp, hHum, hWind, hGust, hRain3h);
+                
+                let statusClass = "t-bad";
+                if (hStatus === "good") statusClass = "t-good";
+                if (hStatus === "warning") statusClass = "t-warning";
+
+                timelineHTML += `
+                    <div class="timeline-item ${statusClass}">
+                        <span class="time">${timeLabel}</span>
+                        <span class="temp">${hTemp.toFixed(0)}°C</span>
+                        <span class="wind">💨 ${hWind.toFixed(0)}m/s</span>
+                    </div>
+                `;
+            }
+            timelineContainer.innerHTML = timelineHTML;
+
+            // --- HARTAURELLA (NYKYHETKEN ANALYYSI) ---
             proView.innerHTML = `
                 <table class="data-table">
-                    <tr><td>🌡 Lämpötila (Optimi 10–20 °C)</td><td><b>${temp} °C</b></td></tr>
-                    <tr><td>💧 Suhteellinen kosteus (Optimi &gt;65 %)</td><td><b>${humidity} %</b></td></tr>
-                    <tr><td>🌫 Kastepistetila</td><td><b>${dew} °C</b></td></tr>
-                    <tr><td>💨 Keskituuli (Raja 4–5 m/s)</td><td><b>${wind} m/s</b></td></tr>
-                    <tr><td>🌬 Tuulen puuskat (Raja 6–7 m/s)</td><td><b>${gust} m/s</b></td></tr>
-                    <tr><td>🌧 Sademäärä lähitunteina</td><td><b>${rain3h.toFixed(1)} mm</b></td></tr>
+                    <tr><td>🌡 Lämpötila (Optimi 10–20 °C)</td><td><b>${currentTemp} °C</b></td></tr>
+                    <tr><td>💧 Suhteellinen kosteus (Optimi &gt;65 %)</td><td><b>${currentHumidity} %</b></td></tr>
+                    <tr><td>🌫 Kastepistetila</td><td><b>${currentDew} °C</b></td></tr>
+                    <tr><td>💨 Keskituuli (Raja 4–5 m/s)</td><td><b>${currentWind} m/s</b></td></tr>
+                    <tr><td>🌬 Tuulen puuskat (Raja 6–7 m/s)</td><td><b>${currentGust} m/s</b></td></tr>
+                    <tr><td>🌧 Sademäärä lähitunteina</td><td><b>${currentRain3h.toFixed(1)} mm</b></td></tr>
                 </table>
             `;
 
             const posReasons = [];
             const negReasons = [];
 
-            // Tuulianalyysi
-            if (wind <= 3) {
+            if (currentWind <= 3) {
                 posReasons.push("Erinomainen tuulirako (alle 3 m/s). Ei riskiä herkkien viljojen tai valkuaiskasvien tuulikulkeumasta.");
-            } else if (wind <= 5) {
+            } else if (currentWind <= 5) {
                 negReasons.push("Kohtalainen keskituuli (3–5 m/s). Vaatii matalaa puomikorkeutta ja mahdollisesti tuulikulkeumaa alentavia suuttimia.");
             } else {
                 negReasons.push("Tuuli liian kova (yli 5 m/s)! Aine karkaa naapurin puolelle tai haihtuu tehon jäädessä heikoksi.");
             }
 
-            // Puuskaanalyysi
-            if (gust <= 5) {
-                posReasons.push("Tasainen ilmanala, puuskat vähäisiä.");
-            } else if (gust <= 7) {
-                negReasons.push("Hieman puuskaista (5–7 m/s). Ny pitää olla tuulen kans tarkkana.");
+            if (currentGust <= 5) {
+                posReasons.push("Tasainen ilmanala, puuskat vähäisiä. Puomi pysyy vakaana.");
+            } else if (currentGust <= 7) {
+                negReasons.push("Hieman puuskaista (5–7 m/s). Puomi saattaa keikahtaa ja aiheuttaa epätasaista jälkeä.");
             } else {
                 negReasons.push("Kovia puuskia (yli 7 m/s). Älä ruiskuta.");
             }
 
-            // Kosteusanalyysi
-            if (humidity >= 65) {
+            if (currentHumidity >= 65) {
                 posReasons.push("Korkea ilmankosteus (yli 65 %). Pisarakoko säilyy ja aine imeytyy lehteen optimaalisesti ennen kuivumista.");
-            } else if (humidity >= 50) {
+            } else if (currentHumidity >= 50) {
                 negReasons.push("Ilmankosteus välttävä (50–65 %). Vältä keskipäivän kuumimpia tunteja, jotta pisarat eivät haihdu ilmasta.");
             } else {
                 negReasons.push("Ilma on aivan liian kuivaa (alle 50 %). Suuri riski, että neste haihtuu ennen kuin ehtii vaikuttaa lehdellä.");
             }
 
-            // Lämpötila-analyysi
-            if (temp >= 10 && temp <= 20) {
+            if (currentTemp >= 10 && currentTemp <= 20) {
                 posReasons.push("Lämpötila täydellinen (10–20 °C). Kasvu dynaamista, jolloin systeemiset aineet tehoavat parhaiten ilman vioitusriskiä.");
-            } else if ((temp >= 6 && temp < 10) || (temp > 20 && temp <= 24)) {
+            } else if ((currentTemp >= 6 && currentTemp < 10) || (currentTemp > 20 && currentTemp <= 24)) {
                 negReasons.push("Lämpötila haastava. Alle 10 °C hidastaa tehoa; yli 20 °C lisää valkuaiskasvien (kuten herneen) vioitus- ja stressiriskiä.");
             } else {
                 negReasons.push("Lämpötila kriittinen (alle 6 °C tai yli 24 °C). Helteellä aineet polttavat kasvuston, kylmällä kasvu on pysähtynyt.");
             }
 
-            // Saderiski
-            if (rain3h === 0) {
+            if (currentRain3h === 0) {
                 posReasons.push("Poutaa lähitunneiksi. Kiinnitteet ja tehoaineet ehtivät kuivua sateen kestäviksi.");
-            } else if (rain3h < 0.2) {
+            } else if (currentRain3h < 0.2) {
                 negReasons.push("Lievää tihkusateen vaaraa ilmassa. Voi heikentää hitaasti imeytyvien aineiden tehoa.");
             } else {
                 negReasons.push("Sadekuuroja tulossa lähiaikoina. Huuhtoutumisvaara on ilmeinen.");
@@ -637,26 +616,4 @@
             const posHTML = posReasons.length > 0 ? `<ul class="reasoning-list"><li>${posReasons.join("</li><li>")}</li></ul>` : "<p>Ei merkittäviä etuja tällä hetkellä.</p>";
             const negHTML = negReasons.length > 0 ? `<ul class="reasoning-list"><li>${negReasons.join("</li><li>")}</li></ul>` : "<p>Ei rajoittavia tekijöitä olosuhteissa.</p>";
 
-            document.getElementById("reasoning").innerHTML = `
-                <h3>Perustelut olosuhteille (Tukes & ProAgria -suositukset)</h3>
-                <div class="reasoning-container">
-                    <div class="reasoning-box pos-box">
-                        <h4>👍 Suotuisat tekijät</h4>
-                        ${posHTML}
-                    </div>
-                    <div class="reasoning-box neg-box">
-                        <h4>👎 Rajoittavat tekijät</h4>
-                        ${negHTML}
-                    </div>
-                </div>
-            `;
-        }
-        catch(e) {
-            simpleView.innerHTML = "❌ Säätietojen haku epäonnistui.";
-            proView.innerHTML = "❌ Säätietojen haku epäonnistui.";
-            console.error(e);
-        }
-    }
-  </script>
-</body>
-</html>
+            document.getElementById("reasoning").innerHTML =
