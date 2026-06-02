@@ -1,0 +1,915 @@
+<!DOCTYPE html>
+<html lang="fi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kuuppelomäki — Maatalouspalvelut, Ruiskutussää &amp; UAV-lentokelpoisuus</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        html { scroll-behavior: smooth; }
+
+        input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            width: 26px; height: 26px;
+            background: #fff;
+            border-radius: 50%;
+            cursor: pointer;
+            border: 3px solid #0f172a;
+            box-shadow: 0 2px 6px rgba(0,0,0,.3);
+        }
+
+        .no-scrollbar::-webkit-scrollbar { display: none; }
+        .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+
+        @keyframes softpulse { 0%,100% { opacity:1 } 50% { opacity:.4 } }
+        .loading-pulse { animation: softpulse 1.4s ease-in-out infinite; }
+    </style>
+</head>
+<body class="bg-slate-50 text-slate-800 font-sans antialiased">
+
+
+<!-- ═══════════════════════════════════════════════════
+     NAVIGAATIO
+════════════════════════════════════════════════════ -->
+<nav class="bg-white border-b border-slate-200 sticky top-0 z-50 shadow-sm">
+    <div class="max-w-6xl mx-auto px-4 py-3 flex flex-wrap items-center justify-between gap-3">
+
+        <div class="flex items-center gap-2">
+            <span class="text-xl font-bold tracking-tight text-slate-900">Kuuppelomäki</span>
+            <span class="text-xs bg-emerald-100 text-emerald-800 px-2 py-0.5 rounded-full font-medium">Maatalouspalvelut</span>
+        </div>
+
+        <div class="flex flex-wrap items-center gap-4">
+            <div class="hidden sm:flex items-center gap-5 text-sm font-medium text-slate-600">
+                <a href="#palvelut"    class="hover:text-emerald-600 transition">Palvelut</a>
+                <a href="#ruiskutussaa" class="hover:text-emerald-600 transition">Ruiskutussää</a>
+                <a href="#uav"         class="hover:text-emerald-600 transition">UAV</a>
+                <a href="#yhteystiedot" class="hover:text-emerald-600 transition">Yhteystiedot</a>
+            </div>
+
+            <!-- Jaettu sijaintihaku — päivittää MOLEMMAT työkalut -->
+            <div class="flex items-center gap-2">
+                <div class="relative">
+                    <input type="text" id="nav-location" value="Seinäjoki"
+                           placeholder="Paikkakunta..."
+                           class="pl-3 pr-7 py-1.5 text-sm bg-white border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500 font-medium w-36 sm:w-44">
+                    <button id="nav-clear" class="absolute right-2 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 text-xs hidden">✕</button>
+                </div>
+                <button id="nav-search-btn"
+                        class="bg-slate-900 hover:bg-slate-800 disabled:bg-slate-400 text-white text-sm font-semibold px-3 py-1.5 rounded-lg transition">
+                    Hae
+                </button>
+            </div>
+        </div>
+    </div>
+</nav>
+
+
+<!-- ═══════════════════════════════════════════════════
+     PALVELUT
+════════════════════════════════════════════════════ -->
+<section id="palvelut" class="max-w-6xl mx-auto px-4 py-12">
+    <div class="text-center mb-10">
+        <h2 class="text-2xl md:text-3xl font-bold text-slate-900">Asiantuntijapalvelut viljelijöille</h2>
+        <p class="text-slate-500 text-sm md:text-base mt-2">Käytännönläheistä neuvontaa ja teknistä tukea tuotannon optimointiin.</p>
+    </div>
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <div class="bg-white p-6 rounded-xl border border-slate-200 shadow-sm space-y-3">
+            <div class="w-10 h-10 bg-emerald-50 rounded-lg flex items-center justify-center text-lg">📋</div>
+            <h3 class="text-lg font-bold text-slate-900">Ilmasto- &amp; ympäristösuunnitelmat</h3>
+            <p class="text-slate-600 text-sm leading-relaxed">Lakisääteisten ja vapaaehtoisten ympäristösitoumusten laadinta, hiilitarkastelut sekä tilakohtaiset kehityssuunnitelmat viranomaisvaatimukset täyttäen.</p>
+        </div>
+        <div class="bg-white p-6 rounded-xl border border-slate-200 shadow-sm space-y-3">
+            <div class="w-10 h-10 bg-emerald-50 rounded-lg flex items-center justify-center text-lg">🛰️</div>
+            <h3 class="text-lg font-bold text-slate-900">RTK-GPS-tukiasemaratkaisut</h3>
+            <p class="text-slate-600 text-sm leading-relaxed">Korkean tarkkuuden ohjausjärjestelmien asennus, konfigurointi ja RTK-korjaussignaalipalvelut täsmäviljelyn tarpeisiin senttimetriluokan tarkkuudella.</p>
+        </div>
+        <div class="bg-white p-6 rounded-xl border border-slate-200 shadow-sm space-y-3">
+            <div class="w-10 h-10 bg-emerald-50 rounded-lg flex items-center justify-center text-lg">🌾</div>
+            <h3 class="text-lg font-bold text-slate-900">Viljelysuunnittelu &amp; konsultointi</h3>
+            <p class="text-slate-600 text-sm leading-relaxed">Datan hyödyntämiseen perustuva lohkokohtainen viljelysuunnittelu, lannoitusoptimointi ja hallinnollinen maaseutuneuvonta arjen tueksi.</p>
+        </div>
+    </div>
+</section>
+
+
+<!-- ═══════════════════════════════════════════════════
+     RUISKUTUSSÄÄ
+════════════════════════════════════════════════════ -->
+<section id="ruiskutussaa" class="bg-slate-100 border-y border-slate-200 py-12 px-4 shadow-inner">
+    <div class="max-w-6xl mx-auto">
+
+        <div class="mb-6 border-b border-slate-300 pb-6">
+            <span class="text-xs uppercase tracking-wider font-bold text-emerald-700 bg-emerald-100/80 px-2.5 py-1 rounded">Kasvinsuojelun työkalu</span>
+            <h2 class="text-2xl md:text-3xl font-extrabold text-slate-900 mt-1">Ammattilaisen Ruiskutussää &amp; Olosuhdeseuranta</h2>
+            <p class="text-xs text-slate-400 mt-1 font-medium">Reaaliaikaiset olosuhteet · Lähde: Open-Meteo</p>
+        </div>
+
+        <!-- Perinteinen säärivistö -->
+        <div class="mb-6 bg-white border border-slate-200 rounded-xl shadow-sm p-4">
+            <h3 class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-3 flex items-center gap-1.5">
+                <span>📊</span> Perinteinen sääennuste (Nyt + 24h)
+            </h3>
+            <div id="spray-forecast-row"
+                 class="flex overflow-x-auto gap-2 pb-2 no-scrollbar">
+                <div class="text-xs text-slate-400 loading-pulse py-2 px-3">Ladataan...</div>
+            </div>
+        </div>
+
+        <!-- Pääasettelu -->
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+
+            <!-- VASEN: Status + Delta T -opas -->
+            <div class="space-y-4 lg:col-span-5">
+
+                <div class="bg-white p-5 rounded-xl shadow-sm border border-slate-200">
+                    <div class="flex justify-between items-center mb-3">
+                        <span class="text-xs text-slate-400 font-bold tracking-wider uppercase">
+                            📍 Alue: <span id="spray-region" class="text-slate-900">Seinäjoki</span>
+                        </span>
+                        <span id="spray-time-badge"
+                              class="text-xs bg-slate-900 text-white px-2 py-0.5 rounded font-mono font-bold">Nyt</span>
+                    </div>
+
+                    <div id="spray-status-box"
+                         class="mb-4 p-4 rounded-lg bg-slate-100 border border-slate-200 text-slate-500 text-sm">
+                        <div class="flex items-start gap-2.5">
+                            <span id="spray-status-dot"
+                                  class="w-2.5 h-2.5 rounded-full mt-1 flex-shrink-0 bg-slate-400 loading-pulse"></span>
+                            <div>
+                                <p id="spray-status-text" class="font-bold">Haetaan säätietoja...</p>
+                                <p id="spray-status-desc" class="text-xs opacity-90 font-normal leading-relaxed mt-0.5">Odota hetki.</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div id="spray-mitigation-box"
+                         class="hidden p-3 rounded-lg bg-blue-50 border border-blue-200 text-blue-900 text-xs leading-relaxed">
+                        <span class="font-bold block mb-1">🛠️ Säädettävä kompensaatio:</span>
+                        <span id="spray-mitigation-text"></span>
+                    </div>
+                </div>
+
+                <!-- Delta T -opas -->
+                <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm space-y-3">
+                    <div class="flex justify-between items-center">
+                        <h4 class="text-xs font-bold text-slate-400 uppercase tracking-wider">Mikä on Delta T (ΔT)?</h4>
+                        <span class="text-[10px] bg-slate-100 px-1.5 py-0.5 rounded font-medium text-slate-500">Haihtumisnopeus</span>
+                    </div>
+                    <p class="text-xs text-slate-600 leading-normal">Erotus kuiva- ja märkälämpötilan välillä. Kertoo pelkkää kosteusprosenttia tarkemmin, ehtiikö ruiskutuspisara kasvin lehdelle ennen kuin se haihtuu suoraan ilmaan.</p>
+                    <div class="grid grid-cols-3 gap-2 pt-1">
+                        <div class="bg-blue-50 border border-blue-100 p-2 rounded text-center">
+                            <span class="block font-bold text-blue-700 text-xs">Alle 2</span>
+                            <span class="text-[10px] font-medium text-slate-500 block mt-0.5">Liian kosteaa</span>
+                            <span class="text-[9px] text-slate-400 leading-none mt-1 block">Kasteen ja valuman riski.</span>
+                        </div>
+                        <div class="bg-emerald-50 border border-emerald-100 p-2 rounded text-center">
+                            <span class="block font-bold text-emerald-700 text-xs">2 – 8</span>
+                            <span class="text-[10px] font-medium text-emerald-600 block mt-0.5">OPTIMI</span>
+                            <span class="text-[9px] text-slate-400 leading-none mt-1 block">Paras imeytyminen.</span>
+                        </div>
+                        <div class="bg-red-50 border border-red-100 p-2 rounded text-center">
+                            <span class="block font-bold text-red-700 text-xs">Yli 8</span>
+                            <span class="text-[10px] font-medium text-slate-500 block mt-0.5">Liian kuivaa</span>
+                            <span class="text-[9px] text-slate-400 leading-none mt-1 block">Pisara haihtuu tuuleen.</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- OIKEA: Metriikat + Aikajana -->
+            <div class="space-y-4 lg:col-span-7">
+
+                <!-- Metriikat -->
+                <div class="bg-white p-5 rounded-xl shadow-sm border border-slate-200 space-y-4">
+                    <h4 class="text-xs font-bold text-slate-400 uppercase tracking-wider">Olosuhdearvot valittuna ajankohtana</h4>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+
+                        <div class="p-3 bg-slate-50 rounded-lg border border-slate-100">
+                            <div class="flex justify-between text-xs mb-1">
+                                <span class="text-slate-600 font-medium">Tuuli (Keski / Puuska)</span>
+                                <span id="spray-wind-status" class="font-bold text-slate-400">—</span>
+                            </div>
+                            <div id="spray-wind-val" class="text-base font-bold text-slate-900 font-mono">— m/s</div>
+                            <div class="w-full bg-slate-200 h-1.5 rounded-full mt-2 overflow-hidden">
+                                <div id="spray-wind-bar" class="h-1.5 bg-slate-300 transition-all duration-300" style="width:0"></div>
+                            </div>
+                        </div>
+
+                        <div class="p-3 bg-slate-50 rounded-lg border border-slate-100">
+                            <div class="flex justify-between text-xs mb-1">
+                                <span class="text-slate-600 font-medium">Ilman lämpötila</span>
+                                <span id="spray-temp-status" class="font-bold text-slate-400">—</span>
+                            </div>
+                            <div id="spray-temp-val" class="text-base font-bold text-slate-900 font-mono">— °C</div>
+                            <div class="w-full bg-slate-200 h-1.5 rounded-full mt-2 overflow-hidden">
+                                <div id="spray-temp-bar" class="h-1.5 bg-slate-300 transition-all duration-300" style="width:0"></div>
+                            </div>
+                        </div>
+
+                        <div class="p-3 bg-slate-50 rounded-lg border border-slate-100">
+                            <div class="flex justify-between text-xs mb-1">
+                                <span class="text-slate-600 font-medium">Suhteellinen kosteus</span>
+                                <span id="spray-rh-status" class="font-bold text-slate-400">—</span>
+                            </div>
+                            <div id="spray-rh-val" class="text-base font-bold text-slate-900 font-mono">— %</div>
+                            <div class="w-full bg-slate-200 h-1.5 rounded-full mt-2 overflow-hidden">
+                                <div id="spray-rh-bar" class="h-1.5 bg-slate-300 transition-all duration-300" style="width:0"></div>
+                            </div>
+                        </div>
+
+                        <div class="p-3 bg-slate-50 rounded-lg border border-slate-100">
+                            <div class="flex justify-between text-xs mb-1">
+                                <span class="text-slate-600 font-medium">Delta T -indeksi</span>
+                                <span id="spray-dt-status" class="font-bold text-slate-400">—</span>
+                            </div>
+                            <div id="spray-dt-val" class="text-base font-bold text-slate-900 font-mono">—</div>
+                            <div class="w-full bg-slate-200 h-1.5 rounded-full mt-2 overflow-hidden">
+                                <div id="spray-dt-bar" class="h-1.5 bg-slate-300 transition-all duration-300" style="width:0"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Aikajana -->
+                <div class="bg-white p-5 rounded-xl shadow-sm border border-slate-200 space-y-4">
+                    <div class="flex justify-between items-center">
+                        <div>
+                            <h4 class="text-xs font-bold text-slate-400 uppercase tracking-wider">Ennusteaikajana (26h)</h4>
+                            <span class="text-[11px] text-slate-400 mt-0.5 block">Taustaväri osoittaa riskitason yhdellä silmäyksellä.</span>
+                        </div>
+                        <div class="text-right">
+                            <span id="spray-timeline-time" class="text-xl font-mono font-black text-slate-900">—:00</span>
+                            <span id="spray-timeline-date" class="text-[10px] block font-medium text-slate-400">—</span>
+                        </div>
+                    </div>
+
+                    <div class="flex items-center gap-3 py-2">
+                        <button id="spray-prev-btn"
+                                class="bg-slate-100 hover:bg-slate-200 disabled:opacity-40 text-slate-800 font-bold w-10 h-10 rounded-lg border border-slate-300 flex items-center justify-center transition active:scale-95 shrink-0 select-none"
+                                disabled>◀</button>
+
+                        <div class="relative flex-1 h-8 flex items-center">
+                            <div id="spray-gradient-bar"
+                                 class="absolute inset-x-0 h-3 rounded-lg shadow-inner pointer-events-none bg-slate-200"></div>
+                            <input type="range" id="spray-slider" min="0" max="25" value="2"
+                                   class="absolute inset-x-0 w-full h-8 bg-transparent appearance-none cursor-pointer focus:outline-none z-10"
+                                   disabled>
+                        </div>
+
+                        <button id="spray-next-btn"
+                                class="bg-slate-100 hover:bg-slate-200 disabled:opacity-40 text-slate-800 font-bold w-10 h-10 rounded-lg border border-slate-300 flex items-center justify-center transition active:scale-95 shrink-0 select-none"
+                                disabled>▶</button>
+                    </div>
+
+                    <div id="spray-timeline-labels"
+                         class="flex justify-between text-[10px] md:text-xs text-slate-400 font-mono px-1 select-none">
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+</section>
+
+
+<!-- ═══════════════════════════════════════════════════
+     UAV-LENTOKELPOISUUS
+════════════════════════════════════════════════════ -->
+<section id="uav" class="max-w-6xl mx-auto px-4 py-12">
+
+    <div class="mb-6 border-b border-slate-200 pb-6">
+        <span class="text-xs uppercase tracking-wider font-bold text-blue-700 bg-blue-100/80 px-2.5 py-1 rounded">Drooni &amp; UAV</span>
+        <h2 class="text-2xl md:text-3xl font-extrabold text-slate-900 mt-1">UAV-Lentokelpoisuus &amp; Signaalit</h2>
+        <p class="text-xs text-slate-400 mt-1 font-medium">Reaaliaikainen ilmatila- ja verkkoanalyysi · Lähde: Open-Meteo + Elisa RSS</p>
+    </div>
+
+    <div id="app-error"
+         class="hidden bg-red-50 border-l-4 border-red-500 text-red-700 p-4 rounded text-sm font-medium mb-4"></div>
+
+    <!-- Päätilakortti -->
+    <div id="uav-status-card"
+         class="bg-white rounded-xl shadow-sm border border-slate-200 p-6 mb-6 transition-all duration-300">
+        <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 border-b border-slate-100 pb-4 mb-4">
+            <div>
+                <span class="text-xs font-bold text-slate-400 uppercase tracking-widest">Yleinen lentokelpoisuusarvio</span>
+                <h2 id="uav-status-title"
+                    class="text-3xl font-black tracking-tight mt-1 text-slate-300 loading-pulse">ALUSTETAAN...</h2>
+            </div>
+            <div class="bg-slate-100 px-3 py-1.5 rounded text-xs font-semibold text-slate-600 shrink-0">
+                Kohdealue: <span id="uav-location-label" class="text-slate-900">Seinäjoki</span>
+            </div>
+        </div>
+        <p id="uav-status-desc" class="text-sm text-slate-500 leading-relaxed">Haetaan reaaliaikaisia tietoja...</p>
+    </div>
+
+    <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-6">
+        <h3 class="text-xs font-bold text-slate-400 uppercase tracking-widest mb-4">Ilmatilan pystyprofiili ja säämuuttujat</h3>
+        <div id="uav-metrics" class="divide-y divide-slate-100">
+            <div class="py-4 text-center text-sm text-slate-400 loading-pulse">Ladataan profiilia...</div>
+        </div>
+    </div>
+</section>
+
+
+<!-- ═══════════════════════════════════════════════════
+     FOOTER
+════════════════════════════════════════════════════ -->
+<footer id="yhteystiedot" class="bg-slate-900 text-slate-400 py-12 px-4 border-t border-slate-800">
+    <div class="max-w-4xl mx-auto text-center space-y-6">
+        <div class="space-y-2">
+            <h3 class="text-white text-xl font-bold tracking-tight">Kuuppelomäki — Maatalouden palvelut</h3>
+            <p class="text-xs text-slate-500">Seinäjoki | Etelä-Pohjanmaa</p>
+        </div>
+        <div class="flex flex-col sm:flex-row justify-center items-center gap-4 sm:gap-8 text-sm text-slate-300 font-medium">
+            <div class="flex items-center gap-2"><span>📞</span><span>040 123 4567</span></div>
+            <div class="flex items-center gap-2"><span>✉️</span><span>kimmo@kuuppelomaki.fi</span></div>
+            <div class="flex items-center gap-2"><span>🌐</span><span>www.kuuppelomaki.fi</span></div>
+        </div>
+        <div class="pt-6 border-t border-slate-800 text-xs text-slate-600">
+            &copy; 2026 Kuuppelomäki. Kaikki oikeudet pidätetään.
+        </div>
+    </div>
+</footer>
+
+
+<!-- ═══════════════════════════════════════════════════
+     SOVELLUKSEN LOGIIKKA
+     Yhdistetty App-nimiavaruus — yksi API-kutsu,
+     kaksi työkalua, jaettu sijaintitila.
+════════════════════════════════════════════════════ -->
+<script>
+'use strict';
+
+const App = {
+
+    /* ────────────────────────────────────────────────
+       Jaettu tila
+    ──────────────────────────────────────────────── */
+    state: {
+        displayName: 'Seinäjoki',
+        hourlySlice: [],   // 26 datapistettä ruiskutustyökalulle (-2h…+23h)
+        nowIndex: 2,       // indeksi hourlySlicessa joka vastaa nykyhetkeä
+        currentData: null  // UAV:n current-vastaus
+    },
+
+
+    /* ────────────────────────────────────────────────
+       Apufunktiot
+    ──────────────────────────────────────────────── */
+    utils: {
+
+        // WMO-sääkoodit → emoji
+        wmoToSymbol(code, isDay) {
+            if (code === 0)        return isDay ? '☀️' : '🌙';
+            if (code <= 2)         return '⛅';
+            if (code === 3)        return '☁️';
+            if (code <= 48)        return '🌫️';
+            if (code <= 67)        return '🌧️';
+            if (code <= 77)        return '❄️';
+            if (code <= 82)        return '🌧️';
+            if (code <= 86)        return '🌨️';
+            return '⛈️';
+        },
+
+        // Approksimatiivinen Delta T -laskenta (GRDC-kaava)
+        calcDeltaT(temp, rh) {
+            return Math.max(0.1, Math.round(temp * (100 - rh) / 100 * 10) / 10);
+        },
+
+        pad2: n => String(n).padStart(2, '0'),
+
+        formatHour(d) {
+            return `${this.pad2(d.getHours())}:00`;
+        },
+
+        formatDate(d) {
+            return `${d.getDate()}.${d.getMonth() + 1}.${d.getFullYear()}`;
+        },
+
+        // Palauttaa {bar, text} CSS-luokat statuksen mukaan
+        statusStyle(status) {
+            return {
+                good:    { bar: 'bg-emerald-500', text: 'text-emerald-600' },
+                warning: { bar: 'bg-amber-500',   text: 'text-amber-600'   },
+                bad:     { bar: 'bg-red-500',      text: 'text-red-600'    }
+            }[status] ?? { bar: 'bg-slate-300', text: 'text-slate-500' };
+        }
+    },
+
+
+    /* ────────────────────────────────────────────────
+       Pääfunktio: geokoodaus → säädata → päivitys
+    ──────────────────────────────────────────────── */
+    async search(query) {
+        query = (query || 'Seinäjoki').trim();
+
+        this._setLoading(true);
+        this._showError(null);
+
+        try {
+            // 1. Geokoodaus
+            const geoRes  = await fetch(
+                `https://geocoding-api.open-meteo.com/v1/search?name=${encodeURIComponent(query)}&count=1&language=fi&format=json`
+            );
+            const geoData = await geoRes.json();
+
+            if (!geoData.results?.length) {
+                this._showError(`Paikkakuntaa "${query}" ei löydetty. Tarkista kirjoitusasu.`);
+                return;
+            }
+
+            const loc = geoData.results[0];
+            this.state.displayName = loc.name;
+
+            // Päivitä UI-sijaintitekstit
+            const regionLabel = loc.admin1 ? `${loc.name}, ${loc.admin1}` : loc.name;
+            document.getElementById('spray-region').innerText       = loc.name;
+            document.getElementById('uav-location-label').innerText = regionLabel;
+
+            // 2. Säädata (current + hourly) ja RSS rinnakkain
+            const weatherUrl =
+                `https://api.open-meteo.com/v1/forecast` +
+                `?latitude=${loc.latitude}&longitude=${loc.longitude}` +
+                `&current=temperature_2m,relative_humidity_2m,precipitation,` +
+                `wind_speed_10m,wind_gusts_10m,wind_speed_80m,wind_speed_120m` +
+                `&hourly=temperature_2m,relative_humidity_2m,precipitation,` +
+                `wind_speed_10m,wind_gusts_10m,weather_code,is_day` +
+                `&wind_speed_unit=ms&timezone=auto&forecast_days=2`;
+
+            const [weatherRes, mobileStatus] = await Promise.all([
+                fetch(weatherUrl),
+                this.UAV._fetchRSS(loc.name)
+            ]);
+
+            const weatherData = await weatherRes.json();
+
+            this.state.currentData  = weatherData.current;
+            this.state.hourlySlice  = this._buildHourlySlice(weatherData.hourly);
+
+            // 3. Päivitä molemmat työkalut
+            this.Spray._update(this.state.hourlySlice, this.state.nowIndex);
+            this.UAV._analyze(this.state.currentData, mobileStatus);
+
+        } catch (err) {
+            console.error('App.search virhe:', err);
+            this._showError('Sääpalveluyhteys epäonnistui. Tarkista verkko ja yritä uudelleen.');
+        } finally {
+            this._setLoading(false);
+        }
+    },
+
+
+    /* ────────────────────────────────────────────────
+       Rakentaa 26-alkioisen siivu tuntidata-vastauksesta
+       (-2h nykyhetkestä … +23h)
+    ──────────────────────────────────────────────── */
+    _buildHourlySlice(hourly) {
+        const now    = new Date();
+        const nowStr = `${now.getFullYear()}-${this.utils.pad2(now.getMonth()+1)}-` +
+                       `${this.utils.pad2(now.getDate())}T${this.utils.pad2(now.getHours())}:00`;
+
+        let currentIdx = hourly.time.findIndex(t => t === nowStr);
+        if (currentIdx === -1) currentIdx = 2; // varmuusfallback
+
+        const startIdx = Math.max(0, currentIdx - 2);
+        this.state.nowIndex = currentIdx - startIdx; // 0, 1 tai 2
+
+        const slice = [];
+        for (let i = 0; i < 26; i++) {
+            const idx = startIdx + i;
+            if (idx >= hourly.time.length) break;
+
+            const d    = new Date(hourly.time[idx]);
+            const temp = hourly.temperature_2m[idx];
+            const rh   = hourly.relative_humidity_2m[idx];
+
+            slice.push({
+                t:      this.utils.formatHour(d),
+                date:   this.utils.formatDate(d),
+                temp:   Math.round(temp),
+                rh:     Math.round(rh),
+                wind:   Math.round(hourly.wind_speed_10m[idx] * 10) / 10,
+                gust:   Math.round(hourly.wind_gusts_10m[idx]  * 10) / 10,
+                rain:   Math.round(hourly.precipitation[idx]   * 10) / 10,
+                dt:     this.utils.calcDeltaT(temp, rh),
+                symbol: this.utils.wmoToSymbol(hourly.weather_code[idx], hourly.is_day[idx])
+            });
+        }
+        return slice;
+    },
+
+
+    /* ────────────────────────────────────────────────
+       UI-apufunktiot
+    ──────────────────────────────────────────────── */
+    _setLoading(on) {
+        const btn    = document.getElementById('nav-search-btn');
+        const slider = document.getElementById('spray-slider');
+        const prev   = document.getElementById('spray-prev-btn');
+        const next   = document.getElementById('spray-next-btn');
+
+        btn.disabled    = on;
+        btn.innerText   = on ? 'Ladataan...' : 'Hae';
+        slider.disabled = on;
+        prev.disabled   = on;
+        next.disabled   = on;
+    },
+
+    _showError(msg) {
+        const el = document.getElementById('app-error');
+        if (msg) { el.innerText = msg; el.classList.remove('hidden'); }
+        else      { el.classList.add('hidden'); }
+    },
+
+
+    /* ════════════════════════════════════════════════
+       RUISKUTUSTYÖKALU
+    ════════════════════════════════════════════════ */
+    Spray: {
+
+        /* Arvioi kasvinsuojelun olosuhteet yhdelle datapistelle */
+        _evaluate(d) {
+            const r = {
+                wind: { status: 'good', label: 'Optimi' },
+                temp: { status: 'good', label: 'Optimi' },
+                rh:   { status: 'good', label: 'Optimi' },
+                dt:   { status: 'good', label: 'Optimi' },
+                severity: 'good',
+                reasons: [],
+                mitigation: ''
+            };
+
+            // Tuuli — tarkistetaan ensin pahempi raja
+            if (d.wind > 4.0 || d.gust > 7.0) {
+                r.wind = { status: 'bad', label: 'Kova tuuli' };
+                r.reasons.push('tuuliraja ylitetty (>4 m/s tai puuska >7 m/s)');
+            } else if (d.wind > 3.0 || d.gust > 5.0) {
+                r.wind = { status: 'warning', label: 'Huomioi puuskat' };
+                r.reasons.push('puuskat koholla');
+                r.mitigation ||= 'Pudota puomikorkeutta (max 40–50 cm kasvustosta), valitse karkeampi pisarakoko ja laske ajonopeutta.';
+            }
+
+            // Lämpötila
+            if (d.temp > 24.0 || d.temp < 6.0) {
+                r.temp = { status: 'bad', label: 'Kriittinen' };
+                r.reasons.push('lämpötila liian korkea/matala');
+            } else if (d.temp > 20.0 || d.temp < 10.0) {
+                r.temp = { status: 'warning', label: 'Haastava' };
+                r.reasons.push('lämpötila epäoptimaalinen');
+                r.mitigation ||= 'Vältä herkkien kasvien käsittelyä kuumassa auringonpaisteessa. Käytä tarvittaessa haihtumisenestoainetta.';
+            }
+
+            // Ilmankosteus
+            if (d.rh < 50) {
+                r.rh = { status: 'bad', label: 'Liian kuivaa' };
+                r.reasons.push('ilmankosteus alle 50%');
+            } else if (d.rh < 65) {
+                r.rh = { status: 'warning', label: 'Välttävä' };
+                r.reasons.push('kuiva ilma (kuivumisriski)');
+                r.mitigation ||= 'Kasvata vesimäärää (≥150 l/ha) ja siirrä kriittiset ajot iltaan kosteuden noustessa.';
+            }
+
+            // Delta T
+            if (d.dt < 1.0 || d.dt > 10.0) {
+                r.dt = { status: 'bad', label: 'Kriittinen ΔT' };
+                r.reasons.push('korkea haihtumis- tai kastevalumariski');
+            } else if (d.dt < 2.0 || d.dt > 8.0) {
+                r.dt = { status: 'warning', label: 'Epäoptimi' };
+                r.reasons.push('Delta T epäoptimaalinen');
+            }
+
+            // Kokonaistila = tiukin yksittäinen
+            const stats = [r.wind.status, r.temp.status, r.rh.status, r.dt.status];
+            if (stats.includes('warning')) r.severity = 'warning';
+            if (stats.includes('bad'))     r.severity = 'bad';
+
+            return r;
+        },
+
+        /* Päivittää koko Spray-osion uudella datalla */
+        _update(slice, nowIndex) {
+            this._renderForecastRow(slice, nowIndex);
+            this._buildGradient(slice);
+            this._renderTimelineLabels(slice, nowIndex);
+
+            const slider = document.getElementById('spray-slider');
+            slider.max   = slice.length - 1;
+            slider.value = nowIndex;
+
+            this._updateMetrics(nowIndex, slice);
+        },
+
+        /* Perinteinen 7h säärivistö */
+        _renderForecastRow(slice, nowIndex) {
+            const container = document.getElementById('spray-forecast-row');
+            container.innerHTML = '';
+            const end = Math.min(nowIndex + 25, slice.length);
+
+            for (let i = nowIndex; i < end; i++) {
+                const d  = slice[i];
+                const el = document.createElement('div');
+                el.className = 'min-w-[72px] bg-slate-50 rounded-lg p-2.5 text-center border border-slate-200 flex flex-col justify-between items-center shrink-0 shadow-sm';
+                el.innerHTML = `
+                    <span class="text-xs font-bold text-slate-500">${d.t}</span>
+                    <span class="text-2xl my-1.5 select-none">${d.symbol}</span>
+                    <span class="text-sm font-black text-slate-900">${d.temp}°</span>
+                    <span class="text-[10px] text-blue-600 font-medium mt-0.5">${d.rain > 0 ? d.rain + ' mm' : '—'}</span>
+                    <span class="text-[10px] text-slate-500 font-mono mt-1">💨 ${Math.round(d.wind)} m/s</span>
+                `;
+                container.appendChild(el);
+            }
+        },
+
+        /* Renderöi aikajanan kellonajat 9 tasavälisen tick-merkin avulla */
+        _renderTimelineLabels(slice, nowIndex) {
+            const container = document.getElementById('spray-timeline-labels');
+            if (!container || !slice.length) return;
+            // 9 tasavälisesti jakautunutta merkkiä koko 26h matkalla
+            const ticks = [0, 3, 6, 9, 12, 15, 18, 21, 25];
+            container.innerHTML = ticks.map(i => {
+                const idx  = Math.min(i, slice.length - 1);
+                const hour = slice[idx].t.substring(0, 2); // "14"
+                const isNow = (idx === nowIndex);
+                return `<span class="${isNow ? 'text-slate-950 font-bold underline' : ''}">${hour}</span>`;
+            }).join('');
+        },
+
+        /* Liukuvärivärjäys riskitasojen mukaan */
+        _buildGradient(slice) {
+            const stops = slice.map((d, i) => {
+                const sev   = this._evaluate(d).severity;
+                const color = sev === 'bad' ? '#ef4444' : sev === 'warning' ? '#f59e0b' : '#10b981';
+                const pct   = Math.round(i / (slice.length - 1) * 100);
+                return `${color} ${pct}%`;
+            });
+            document.getElementById('spray-gradient-bar').style.background =
+                `linear-gradient(to right, ${stops.join(', ')})`;
+        },
+
+        /* Päivittää metriikat ja statuslaatikot valitulle indeksille */
+        _updateMetrics(index, slice) {
+            slice = slice || App.state.hourlySlice;
+            const d = slice[index];
+            if (!d) return;
+
+            const report   = this._evaluate(d);
+            const isNow    = (index === App.state.nowIndex);
+
+            // Ajat
+            document.getElementById('spray-time-badge').innerText    = isNow ? `Nyt (Klo ${d.t})` : `Klo ${d.t}`;
+            document.getElementById('spray-timeline-time').innerText = `Klo ${d.t}`;
+            document.getElementById('spray-timeline-date').innerText = d.date;
+
+            // Arvot
+            document.getElementById('spray-wind-val').innerText = `${d.wind} m/s (puuska ${d.gust} m/s)`;
+            document.getElementById('spray-temp-val').innerText = `${d.temp} °C`;
+            document.getElementById('spray-rh-val').innerText   = `${d.rh} %`;
+            document.getElementById('spray-dt-val').innerText   = d.dt;
+
+            // Mittaripalkit — yhteinen apufunktio
+            const setBar = (barId, statId, metricReport, val, maxVal) => {
+                const s = App.utils.statusStyle(metricReport.status);
+                document.getElementById(barId).style.width  = `${Math.min(val / maxVal * 100, 100)}%`;
+                document.getElementById(barId).className    = `${s.bar} h-1.5 transition-all duration-300`;
+                document.getElementById(statId).className   = `${s.text} font-bold text-xs`;
+                document.getElementById(statId).innerText   = metricReport.label;
+            };
+            setBar('spray-wind-bar', 'spray-wind-status', report.wind, d.wind, 6);
+            setBar('spray-temp-bar', 'spray-temp-status', report.temp, d.temp, 25);
+            setBar('spray-rh-bar',   'spray-rh-status',   report.rh,   d.rh,  100);
+            setBar('spray-dt-bar',   'spray-dt-status',   report.dt,   d.dt,  12);
+
+            // Päästatuslaatikko
+            const CONFIGS = {
+                good: {
+                    box:   'mb-4 p-4 rounded-lg bg-emerald-50 border border-emerald-200 text-emerald-900 shadow-sm',
+                    dot:   'w-2.5 h-2.5 rounded-full mt-1 flex-shrink-0 bg-emerald-500 animate-pulse',
+                    title: 'Optimaaliset ruiskutusolosuhteet',
+                    desc:  'Kaikki parametrit täyttävät ihanteet. Tehoaine saavuttaa täyden tehon turvallisesti.'
+                },
+                warning: {
+                    box:   'mb-4 p-4 rounded-lg bg-amber-50 border border-amber-200 text-amber-900 shadow-sm',
+                    dot:   'w-2.5 h-2.5 rounded-full mt-1 flex-shrink-0 bg-amber-500',
+                    title: 'Rajoittavia säätekijöitä havaittu',
+                    desc:  `Huomioitavaa: ${report.reasons.join(' ja ')}. Ruiskutusta voi jatkaa säätämällä tekniikkaa.`
+                },
+                bad: {
+                    box:   'mb-4 p-4 rounded-lg bg-red-50 border border-red-200 text-red-900 shadow-sm',
+                    dot:   'w-2.5 h-2.5 rounded-full mt-1 flex-shrink-0 bg-red-500',
+                    title: 'Kriittiset olosuhteet — ajoa ei suositella',
+                    desc:  `Esteet: ${report.reasons.join(', ')}. Suuri riski haihtumiselle tai tuulikulkeumalle.`
+                }
+            };
+            const cfg = CONFIGS[report.severity];
+            document.getElementById('spray-status-box').className  = cfg.box;
+            document.getElementById('spray-status-dot').className  = cfg.dot;
+            document.getElementById('spray-status-text').innerText = cfg.title;
+            document.getElementById('spray-status-desc').innerText = cfg.desc;
+
+            const mitBox = document.getElementById('spray-mitigation-box');
+            if (report.severity === 'warning' && report.mitigation) {
+                document.getElementById('spray-mitigation-text').innerText = report.mitigation;
+                mitBox.classList.remove('hidden');
+            } else {
+                mitBox.classList.add('hidden');
+            }
+        },
+
+        /* Kytkee liukurin ja painikkeet */
+        _initControls() {
+            const slider = document.getElementById('spray-slider');
+            const prev   = document.getElementById('spray-prev-btn');
+            const next   = document.getElementById('spray-next-btn');
+
+            slider.addEventListener('input', e => {
+                this._updateMetrics(parseInt(e.target.value, 10));
+            });
+            prev.addEventListener('click', () => {
+                const v = parseInt(slider.value, 10);
+                if (v > 0) { slider.value = v - 1; this._updateMetrics(v - 1); }
+            });
+            next.addEventListener('click', () => {
+                const v = parseInt(slider.value, 10);
+                if (v < parseInt(slider.max, 10)) { slider.value = v + 1; this._updateMetrics(v + 1); }
+            });
+        }
+    },
+
+
+    /* ════════════════════════════════════════════════
+       UAV-TYÖKALU
+    ════════════════════════════════════════════════ */
+    UAV: {
+
+        _LIMITS: {
+            consumer: { windMax: 9,  tempMin: 0,   tempMax: 40, precipMax: 0   },
+            pro:      { windMax: 14, tempMin: -15, tempMax: 45, precipMax: 1.5 }
+        },
+
+        /* Hakee Elisan RSS-häiriöfeedin CORS-proxyn kautta */
+        async _fetchRSS(locationName) {
+            try {
+                const proxyUrl = `https://api.allorigins.win/get?url=${encodeURIComponent('https://status.elisa.fi/feed/rss')}`;
+                const res  = await fetch(proxyUrl);
+                if (!res.ok) throw new Error('proxy error');
+
+                const json  = await res.json();
+                const xml   = new DOMParser().parseFromString(json.contents, 'text/xml');
+                const items = xml.getElementsByTagName('item');
+                const name  = locationName.toLowerCase();
+
+                for (const item of items) {
+                    const title = item.getElementsByTagName('title')[0]?.textContent || '';
+                    const desc  = item.getElementsByTagName('description')[0]?.textContent || '';
+                    if (title.toLowerCase().includes(name) || desc.toLowerCase().includes(name)) {
+                        return { unstable: true, msg: `Häiriö havaittu: ${title}` };
+                    }
+                }
+                return { unstable: false, msg: `Ei raportoitua mobiiliverkkohäiriötä (${locationName}).` };
+            } catch {
+                return { unstable: false, msg: 'RSS-feed ei vastaa. Tarkista kuuluvuus manuaalisesti.' };
+            }
+        },
+
+        /* Rakentaa metriikkataulu ja päivittää kaikki UAV-osat */
+        _analyze(s, mobile) {
+            const L = this._LIMITS;
+            const maxWind10   = Math.max(s.wind_speed_10m, s.wind_gusts_10m);
+            const freezeRisk  = s.temperature_2m >= -4 && s.temperature_2m <= 3 && s.relative_humidity_2m > 85;
+
+            const level = n => n > L.pro.windMax ? 2 : n > L.consumer.windMax ? 1 : 0;
+            const tempLevel = t =>
+                (t < L.pro.tempMin  || t > L.pro.tempMax)  ? 2 :
+                (t < L.consumer.tempMin || t > L.consumer.tempMax) ? 1 : 0;
+
+            const metrics = [
+                {
+                    name:  'Maks. lentokorkeuden tuuli (120 m AGL)',
+                    val:   `${s.wind_speed_120m.toFixed(1)} m/s`,
+                    desc:  'Yläkorkeuden laminaarinen voimavirtaus.',
+                    level: level(s.wind_speed_120m)
+                },
+                {
+                    name:  'Keskikorkeuden tuuli (80 m AGL)',
+                    val:   `${s.wind_speed_80m.toFixed(1)} m/s`,
+                    desc:  'Siirtymäkerroksen tuulivaihtelu.',
+                    level: level(s.wind_speed_80m)
+                },
+                {
+                    name:  'Maanpinnan tuuli ja puuskat (10 m)',
+                    val:   `${s.wind_speed_10m.toFixed(1)} m/s (puuska ${s.wind_gusts_10m.toFixed(1)} m/s)`,
+                    desc:  'Mekaaninen turbulenssi nousussa ja laskussa.',
+                    level: level(maxWind10)
+                },
+                {
+                    name:  'Ulkolämpötila (2 m)',
+                    val:   `${Math.round(s.temperature_2m)} °C`,
+                    desc:  'Akuston tyhjentymisnopeus ja kuormitus.',
+                    level: tempLevel(s.temperature_2m)
+                },
+                {
+                    name:  'Sademäärä',
+                    val:   `${s.precipitation.toFixed(1)} mm/h`,
+                    desc:  'Kosteuden aiheuttama oikosulkuriski (IP-luokitusvaatimus).',
+                    level: s.precipitation > L.pro.precipMax ? 2 : s.precipitation > L.consumer.precipMax ? 1 : 0
+                },
+                {
+                    name:  'Jäätymisriski',
+                    val:   freezeRisk ? 'KORKEA' : 'NORMAALI',
+                    desc:  'Ilmankosteuden ja kastepisteen kriittinen kohtaaminen.',
+                    level: freezeRisk ? 1 : 0
+                }
+            ];
+
+            const maxLevel = metrics.reduce((m, x) => Math.max(m, x.level), 0);
+
+            this._renderMetrics(metrics);
+            this._updateStatusCard(maxLevel, mobile.unstable);
+        },
+
+        _renderMetrics(metrics) {
+            const TAG = {
+                0: `<span class="bg-emerald-100 text-emerald-800 text-[10px] font-bold px-2 py-0.5 rounded">KAIKKI UAV-LUOKAT OK</span>`,
+                1: `<span class="bg-amber-100 text-amber-800 text-[10px] font-bold px-2 py-0.5 rounded">VAATII AMMATTIKALUSTON</span>`,
+                2: `<span class="bg-red-100 text-red-800 text-[10px] font-bold px-2 py-0.5 rounded">ESTETTY KAIKILTA (NO-GO)</span>`
+            };
+
+            document.getElementById('uav-metrics').innerHTML = metrics.map(m => `
+                <div class="py-3.5 flex flex-col sm:flex-row justify-between sm:items-center gap-2">
+                    <div>
+                        <div class="flex items-center gap-2 flex-wrap">
+                            <span class="font-semibold text-sm text-slate-900">${m.name}</span>
+                            ${TAG[m.level]}
+                        </div>
+                        <span class="text-xs text-slate-400 block mt-0.5">${m.desc}</span>
+                    </div>
+                    <span class="font-mono text-sm font-bold text-slate-900 bg-slate-100 px-2 py-1 rounded self-start sm:self-center">${m.val}</span>
+                </div>
+            `).join('');
+        },
+
+        _updateStatusCard(level, mobileUnstable) {
+            const card  = document.getElementById('uav-status-card');
+            const title = document.getElementById('uav-status-title');
+            const desc  = document.getElementById('uav-status-desc');
+
+            if (level === 2) {
+                card.className  = 'bg-red-50/40 rounded-xl shadow-sm border border-red-400 p-6 mb-6 transition-all duration-300';
+                title.className = 'text-3xl font-black tracking-tight mt-1 text-red-600';
+                title.innerText = 'LENTOTOIMINTA ESTETTY (NO-GO)';
+                desc.innerText  = 'Sääolosuhteet (yläkorkeuden tuuli tai rankka sade) ylittävät ammattitasonkin kaluston turvarajat. Älä nouse ilmaan.';
+                return;
+            }
+            if (level === 1 || mobileUnstable) {
+                card.className  = 'bg-amber-50/40 rounded-xl shadow-sm border border-amber-400 p-6 mb-6 transition-all duration-300';
+                title.className = 'text-3xl font-black tracking-tight mt-1 text-amber-600';
+                title.innerText = 'PRO-LUOKKA SALLITTU (VAIN AMMATTIKALUSTO)';
+                let msg = 'Kuluttajalaitteiden rajat ylitetty. Lento on sallittu raskaammalla ammattikalustolla (Open A2 / Specific), jonka IP-luokitus ja moottoriteho vastaavat nykyistä profiilia.';
+                if (mobileUnstable) msg += ' Huom! Mobiiliverkkohäiriö saattaa katkaista RTK/NTRIP-korjaussignaalin — varaudu käsiohjaukseen ja näköyhteyteen.';
+                desc.innerText = msg;
+                return;
+            }
+            card.className  = 'bg-emerald-50/40 rounded-xl shadow-sm border border-emerald-400 p-6 mb-6 transition-all duration-300';
+            title.className = 'text-3xl font-black tracking-tight mt-1 text-emerald-600';
+            title.innerText = 'KAIKKI UAV-LUOKAT SALLITTU (GO)';
+            desc.innerText  = 'Ilmakehän pystyprofiili on vakaa, eikä RSS-seurannassa ole aktiivisia solukkovikoja. Sekä kuluttaja- että ammattilaislaitteet voivat operoida vapaasti.';
+        }
+    },
+
+
+    /* ────────────────────────────────────────────────
+       Navigaation sijaintihaku
+    ──────────────────────────────────────────────── */
+    _initNav() {
+        const input    = document.getElementById('nav-location');
+        const btn      = document.getElementById('nav-search-btn');
+        const clearBtn = document.getElementById('nav-clear');
+
+        const doSearch = () => this.search(input.value);
+
+        btn.addEventListener('click', doSearch);
+        input.addEventListener('keypress', e => { if (e.key === 'Enter') doSearch(); });
+        input.addEventListener('input', () => {
+            clearBtn.classList.toggle('hidden', input.value.length === 0);
+        });
+        clearBtn.addEventListener('click', () => {
+            input.value = '';
+            clearBtn.classList.add('hidden');
+            input.focus();
+        });
+    }
+};
+
+
+/* ────────────────────────────────────────────────
+   Käynnistys
+──────────────────────────────────────────────── */
+document.addEventListener('DOMContentLoaded', () => {
+    App.Spray._initControls();
+    App._initNav();
+    App.search('Seinäjoki');
+});
+</script>
+</body>
+</html>
